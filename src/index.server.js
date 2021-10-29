@@ -27,6 +27,8 @@ mongoose.connect(
         useCreateIndex: true,
         useFindAndModify: false
     }).then(() => {
+        console.log(process.env.DATABASE_URL);
+        console.log(uri);
         console.log("Database Connected");
     })
 
