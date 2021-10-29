@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "This is backend",
   "main": "index.js",
+  "engines": {
+    "node": "12.11.1"
+  },
   "scripts": {
-    "start": "nodemon ./src/index.server.js"
+    "start": "node ./src/index.server.js"
   },
   "keywords": [
     "ecommerce",
