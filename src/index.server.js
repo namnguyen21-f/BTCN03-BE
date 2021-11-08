@@ -16,7 +16,7 @@ app.use(express.urlencoded({
     extended: true
 }));
 
-const uri = process.env.MONGODB_URI;
+const uri = process.env.MONGODB_URI || "mongodb+srv://Admin:viH6ZogRwtSAW9tT@cluster0.mpci4.mongodb.net/Ecommerce?retryWrites=true&w=majority";
 
 //Database initialize
 mongoose.connect(
@@ -38,7 +38,6 @@ app.use(function(req, res, next) {
         jwt.verify(req.headers.authorization.split(' ')[1], 'RESTFULAPIs', function(err, decode) {
         if (err) req.user = undefined;
         req.user = decode;
-        
         next();
         });
     } else {

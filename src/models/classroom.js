@@ -17,6 +17,14 @@ const ckSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
+    createdBy: {
+        type: String,
+        require: true,
+    },
+    createdByName: {
+        type: String,
+        require: true,
+    }
 },{timestamps: true});
 
 module.exports = mongoose.model("Classroom", ckSchema);

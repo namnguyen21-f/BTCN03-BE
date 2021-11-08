@@ -15,7 +15,8 @@ exports.signup = (req,res) =>{
             email,
             password,
             userName,
-            phone
+            phone,
+            role
         } = req.body;
         const newUser = new User({
             firstName : firstName,
@@ -24,6 +25,7 @@ exports.signup = (req,res) =>{
             password : password,
             userName: userName,
             phone: phone,
+            role: role,
         })
         newUser.save((err,data) => {
             if (err){
