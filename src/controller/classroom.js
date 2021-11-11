@@ -126,7 +126,7 @@ exports.sendInvitationLink = (req,res) => {
         smtpTransport.sendMail(mailOptions, function(error, info) {
             if (error) {
                 return res.status(400).json({
-                    err: err,
+                    err: error,
                 })
             } else {
                 return res.status(200).json({
