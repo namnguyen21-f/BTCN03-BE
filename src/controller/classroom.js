@@ -1,5 +1,14 @@
 const Classroom = require("../models/classroom");
 const User = require("../models/user");
+var nodemailer = require("nodemailer");
+
+var smtpTransport = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+        user: "proitem123@gmail.com",
+        pass: "proitem123"
+    }
+});
 
 exports.createNewClass = (req, res) => {
     if (req.user){
@@ -102,6 +111,35 @@ exports.searchClass = (req, res) => {
         }
 
     })
+}
+
+exports.sendInvitationLink = (req,res) => {
+    if (req.user){
+        const to = req.body.email;
+        const link = 'https://dashboard.heroku.com/apps/btcn03-18127160/' + req.params.id + '/invite';
+        var mailOptions = {
+            to: to,
+            subject: "Email for inviting user to class",
+            html: `<p> Your invitation link is: <a href='${link}'> ${link}</a>`
+        }
+
+        smtpTransport.sendMail(mailOptions, function(error, info) {
+            if (error) {
+                return res.status(400).json({
+                    err: err,
+                })
+            } else {
+                return res.status(200).json({
+                    message: "Email has been sent",
+                })
+            }
+        });
+    }else{
+        return res.status(400).json({
+            err: "err",
+        })
+    }
+    
 }
 
 

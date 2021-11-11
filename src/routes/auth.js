@@ -2,7 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 const {signin,signup} = require("../controller/auth");
-const {createNewClass, getAllClass,getSpecificClass} = require("../controller/classroom");
+const {createNewClass, getAllClass,getSpecificClass, sendInvitationLink} = require("../controller/classroom");
 // const {addStock ,getStockList, getStockStatistic ,getStockProfit , getUserCurrentStock, getStockTransactionMonth} = require("../controller/stock");
 
 function atc (req,res){
@@ -24,6 +24,7 @@ router.post('/signup' , signup);
 router.post('/class/new' , createNewClass);
 router.get('/class/getAll' , getAllClass);
 router.get('/class/:id' , getSpecificClass);
+router.post('/class/:id/invite' , sendInvitationLink);
 
 // router.post('/addStock' , addStock);
 

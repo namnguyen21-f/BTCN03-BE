@@ -25,6 +25,7 @@
     "express-validator": "^6.11.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.10",
+    "nodemailer": "^6.7.0",
     "save": "^2.4.0"
   },
   "devDependencies": {
