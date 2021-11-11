@@ -139,7 +139,7 @@ exports.sendInvitationLink = (req,res) => {
                         })
                     }else{
                         const to = req.body.email;
-                        const link = 'https://btcn03-18127160.herokuapp.com/api/class/' + req.params.id + '/invite/' + data._id;
+                        const link = 'https://btcn03-18127160.herokuapp.com/api/class' + req.params.id + '/invite/' + data._id;
                         var mailOptions = {
                             to: to,
                             subject: "Email for inviting user to class",
@@ -208,72 +208,69 @@ exports.joininClass = (req,res) => {
 }
 
 exports.readInvitationLink = (req,res) => {
-    if (req.user){
-        Invitation.findOne({_id : req.params.id})
-        .exec((err, ivt) => {
-            if (ivt){
-                Classroom.findOne({_id : ivt.classId})
-                .exec((err, cls) => {
-                    if (cls){
-                        for (let i=0; i < cls.attendantList.length ;i++){
-                            if (cls.attendantList[i]._id == ivt.classId){
-                                return res.status(200).json({
-                                    message: "User has been added",
-                                })
-                            }
+    Invitation.findOne({_id : req.params.id})
+    .exec((err, ivt) => {
+        if (ivt){
+            Classroom.findOne({_id : ivt.classId})
+            .exec((err, cls) => {
+                if (cls){
+                    console.log(cls)
+                    for (let i=0; i < cls.attendantList.length ;i++){
+                        if (cls.attendantList[i]._id == ivt.classId){
+                            return res.status(200).json({
+                                message: "User has been added",
+                            })
                         }
-                        User.findOne({_id: req.user._id})
-                        .exec((err,user) => {
-                            if (user){
-                                cls.attendantList.push(user);
-                                cls.save( function(err){
-                                    if(err) return res.status(500).send(err);
-                                    return res.status(200).send({message: "OK"})
-                                })
-                            }else{
-                                const newUser = new User({
-                                    firstName : "",
-                                    lastName : "",
-                                    email: ivt.toEmail,
-                                    password : "",
-                                    userName: "",
-                                    phone: "",
-                                })
-                                newUser.save((err,data) => {
-                                    if (err){
-                                        return res.status(400).json({
-                                            message: "Something Wrong",
-                                            err: err,
-                                        })
-                                    }else{
-                                        cls.attendantList.push(data);
-                                        cls.save( function(err){
-                                            if(err) return res.status(500).send(err);
-                                            return res.status(200).send({message: "OK"})
-                                        })
-                                    } 
-                                })
-                            }
-                        })
-                    }else{
-                        return res.status(400).json({
-                            message: "Classrom does not exist",
-                        })
                     }
-                })
-            }else{
-                return res.status(400).json({
-                    message: "Invitation link is invalid",
-                })
-            }
-        })
-        
-    }else{
-        return res.status(400).json({
-            err: "err",
-        })
-    }
-    
+                    User.findOne({email: ivt.toEmail})
+                    .exec((err,user) => {
+                        console.log(user)
+                        if (user){
+                            cls.attendantList.push(user);
+                            cls.save( function(err){
+                                if(err) return res.status(500).send(err);
+                                return res.status(200).send({message: "OK"})
+                            })
+                        }else{
+                            
+                            const newUser = new User({
+                                firstName : "",
+                                lastName : "",
+                                email: ivt.toEmail,
+                                password : "",
+                                userName: "",
+                                phone: "",
+                            })
+                            console.log(newUser)
+                            newUser.save((err,data) => {
+                                if (err){
+                                    return res.status(400).json({
+                                        message: "Something Wrong",
+                                        err: err,
+                                    })
+                                }else{
+                                    cls.attendantList.push(data);
+                                    cls.save( function(err){
+                                        if(err) return res.status(500).send(err);
+                                        return res.status(200).send({message: "OK"})
+                                    })
+                                } 
+                            })
+                        }
+                    })
+                }else{
+                    return res.status(400).json({
+                        message: "Classrom does not exist",
+                    })
+                }
+            })
+        }else{
+            return res.status(400).json({
+                message: "Invitation link is invalid",
+            })
+        }
+    })
+
 }
 
 
