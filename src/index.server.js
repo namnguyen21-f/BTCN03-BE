@@ -16,8 +16,8 @@ app.use(express.urlencoded({
     extended: true
 }));
 
-const uri = process.env.MONGODB_URI || "mongodb+srv://Admin:viH6ZogRwtSAW9tT@cluster0.mpci4.mongodb.net/Ecommerce?retryWrites=true&w=majority";
-
+const uri = process.env.MONGODB_URI ;
+//|| "mongodb+srv://Admin:viH6ZogRwtSAW9tT@cluster0.mpci4.mongodb.net/Ecommerce?retryWrites=true&w=majority"
 //Database initialize
 mongoose.connect(
     uri, 
@@ -54,7 +54,7 @@ app.get('/', (req,res,next) => {
 
 app.use('/api', authRoutes);
 // 
-
+//
 app.listen(process.env.PORT || 3000, () => {
     console.log("Server is running on port " + process.env.PORT)
 })
