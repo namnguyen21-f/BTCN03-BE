@@ -214,7 +214,7 @@ exports.readInvitationLink = (req,res) => {
             Classroom.findOne({_id : ivt.classId})
             .exec((err, cls) => {
                 if (cls){
-                    console.log(cls)
+                    
                     for (let i=0; i < cls.attendantList.length ;i++){
                         if (cls.attendantList[i]._id == ivt.classId){
                             return res.status(200).json({
@@ -224,7 +224,7 @@ exports.readInvitationLink = (req,res) => {
                     }
                     User.findOne({email: ivt.toEmail})
                     .exec((err,user) => {
-                        console.log(user)
+                        
                         if (user){
                             cls.attendantList.push(user);
                             cls.save( function(err){
@@ -234,14 +234,14 @@ exports.readInvitationLink = (req,res) => {
                         }else{
                             
                             const newUser = new User({
-                                firstName : "",
-                                lastName : "",
+                                firstName : "xxxxxx",
+                                lastName : "xxxxxx",
                                 email: ivt.toEmail,
-                                password : "",
-                                userName: "",
-                                phone: "",
+                                password : "xxxxxx",
+                                userName: "xxxxxx",
+                                phone: "009999999",
                             })
-                            console.log(newUser)
+                            
                             newUser.save((err,data) => {
                                 if (err){
                                     return res.status(400).json({
