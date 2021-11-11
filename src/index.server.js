@@ -16,8 +16,8 @@ app.use(express.urlencoded({
     extended: true
 }));
 
-const uri = process.env.MONGODB_URI ;
-//|| "mongodb+srv://Admin:viH6ZogRwtSAW9tT@cluster0.mpci4.mongodb.net/Ecommerce?retryWrites=true&w=majority"
+const uri = process.env.MONGODB_URI || "mongodb+srv://Admin:viH6ZogRwtSAW9tT@cluster0.mpci4.mongodb.net/Ecommerce?retryWrites=true&w=majority";
+//|| 
 //Database initialize
 mongoose.connect(
     uri, 

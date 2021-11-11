@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const User = require('./user').schema;
 
 const ckSchema = new mongoose.Schema({ 
     classId: {
@@ -24,7 +25,9 @@ const ckSchema = new mongoose.Schema({
     createdByName: {
         type: String,
         require: true,
-    }
+    },
+    attendantList: [{type: User}],
 },{timestamps: true});
+
 
 module.exports = mongoose.model("Classroom", ckSchema);
