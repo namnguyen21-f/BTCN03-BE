@@ -7,7 +7,7 @@
     "node": "12.11.1"
   },
   "scripts": {
-    "start": "nodemon ./src/index.server.js"
+    "start": "node ./src/index.server.js"
   },
   "keywords": [
     "ecommerce",
