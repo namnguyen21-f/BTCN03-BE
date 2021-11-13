@@ -1,11 +1,11 @@
 const express = require("express");
 
 const router = express.Router();
-const {signin,signup} = require("../controller/auth");
+
 const {createNewClass, getAllClass,getSpecificClass
         , sendInvitationLink,readInvitationLink, joininClass} = require("../controller/classroom");
 const {signin,signup, facebookLogin, googleLogin} = require("../controller/auth");
-const {createNewClass, getAllClass,getSpecificClass} = require("../controller/classroom");
+
 // const {addStock ,getStockList, getStockStatistic ,getStockProfit , getUserCurrentStock, getStockTransactionMonth} = require("../controller/stock");
 
 function atc (req,res){

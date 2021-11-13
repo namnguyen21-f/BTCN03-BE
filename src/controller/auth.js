@@ -98,15 +98,19 @@ exports.googleLogin= (req, res)=>{
     client.verifyIdToken({idToken: tokenId, audience: "405769286115-ccpu4vsplvrfttij8im3r7hbhsoupg1h.apps.googleusercontent.com"}).then(response=>{
         const {email_verified, name, email}= response.payload;
         if(email_verified){
-            User.findOne({email}).exec((err, user)=>{
+            User.findOne({email: email}).exec((err, user)=>{
+                
                 if(err){
                     return res.status(400).json({
                         error: 'Something went wrong...'
                     })
                 }
                 else{
+                    //process.env.JWT_SIGNIN_KEY RESTFULAPIs"
+                    
                     if(user){
-                        const token= jwt.sign({_id: user._id}, process.env.JWT_SIGNIN_KEY, {expiresIn: '2h'});
+                        console.log("p2l");
+                        const token= jwt.sign({_id: user._id}, "RESTFULAPIs", {expiresIn: '2h'});
                         const {_id, name, email}= user;
                         res.json({
                             token,
@@ -114,15 +118,20 @@ exports.googleLogin= (req, res)=>{
                         })
                     }
                     else{
-                        const password= email + process.env.JWT_SIGNIN_KEY;
-                        const newUser= new User({userName: name, email, password});
+                        
+                        const password= email + "RESTFULAPIs";
+                        const newUser= new User({
+                            firstName: "Unknown", lastName: "Unknown",
+                            userName: name, email, password
+                        });
                         newUser.save((err, data)=>{
+                            console.log("pl1");
                             if(err){
                                 return res.status(400).json({
                                     error: 'Something went wrong...'
                                 })
                             }
-                            const token= jwt.sign({_id: data._id}, process.env.JWT_SIGNIN_KEY, {expiresIn: '2h'});
+                            const token= jwt.sign({_id: data._id}, "RESTFULAPIs", {expiresIn: '2h'});
                             const {_id, name, email}= newUser;
                             res.json({
                                 token,
@@ -161,7 +170,7 @@ exports.facebookLogin= async (req, res)=>{
                 }
                 else{
                     if(user){
-                        const token= jwt.sign({_id: user._id}, process.env.JWT_SIGNIN_KEY, {expiresIn: '2h'});
+                        const token= jwt.sign({_id: user._id}, "RESTFULAPIs", {expiresIn: '2h'});
                         const {_id, name, email}= user;
                         res.json({
                             token,
@@ -169,15 +178,17 @@ exports.facebookLogin= async (req, res)=>{
                         })
                     }
                     else{
-                        const password= email + process.env.JWT_SIGNIN_KEY;
-                        const newUser= new User({userName: name, email, password});
+                        const password= email + "RESTFULAPIs";
+                        const newUser= new User({
+                            firstName: "Unknown", lastName: "Unknown",
+                            userName: name, email, password});
                         newUser.save((err, data)=>{
                             if(err){
                                 return res.status(400).json({
                                     error: 'Something went wrong...'
                                 })
                             }
-                            const token= jwt.sign({_id: data._id}, process.env.JWT_SIGNIN_KEY, {expiresIn: '2h'});
+                            const token= jwt.sign({_id: data._id}, "RESTFULAPIs", {expiresIn: '2h'});
                             const {_id, name, email}= data;
                             res.json({
                                 token,
