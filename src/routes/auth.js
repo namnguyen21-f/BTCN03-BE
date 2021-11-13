@@ -4,6 +4,8 @@ const router = express.Router();
 const {signin,signup} = require("../controller/auth");
 const {createNewClass, getAllClass,getSpecificClass
         , sendInvitationLink,readInvitationLink, joininClass} = require("../controller/classroom");
+const {signin,signup, facebookLogin, googleLogin} = require("../controller/auth");
+const {createNewClass, getAllClass,getSpecificClass} = require("../controller/classroom");
 // const {addStock ,getStockList, getStockStatistic ,getStockProfit , getUserCurrentStock, getStockTransactionMonth} = require("../controller/stock");
 
 function atc (req,res){
@@ -25,6 +27,8 @@ router.post('/signup' , signup);
 router.post('/class/new' , createNewClass);
 router.get('/class/getAll' , getAllClass);
 router.get('/class/:id' , getSpecificClass);
+router.post('/facebookLogin', facebookLogin);
+router.post('/googleLogin', googleLogin);
 
 router.post('/class/:id/invite' , sendInvitationLink);
 
