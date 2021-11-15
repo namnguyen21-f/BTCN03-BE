@@ -185,7 +185,7 @@ exports.sendInvitationLink = (req,res) => {
                         })
                     }else{
                         const to = req.body.email;
-                        const link = 'https://btcn03-18127160.herokuapp.com/api/class' + req.params.id + '/invite/' + data._id;
+                        const link = 'https://midtermproject160220.herokuapp.com/api/class' + req.params.id + '/invite/' + data._id;
                         var mailOptions = {
                             to: to,
                             subject: "Email for inviting user to class",
@@ -219,7 +219,7 @@ exports.sendInvitationLink = (req,res) => {
 
 exports.generateLink = (req,res) => {
     if (req.user){
-        const link = 'https://btcn03-18127160.herokuapp.com/api/class/' + req.params.id + '/invite/url';
+        const link = 'https://midtermproject160220.herokuapp.com/api/class/' + req.params.id + '/invite/url';
         return res.status(200).json({
             data : link,
         }) 
