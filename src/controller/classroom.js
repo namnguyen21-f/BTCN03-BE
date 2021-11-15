@@ -219,7 +219,7 @@ exports.sendInvitationLink = (req,res) => {
 
 exports.generateLink = (req,res) => {
     if (req.user){
-        const link = 'https://midtermproject160220.herokuapp.com/api/class/' + req.params.id + '/invite/url';
+        const link = 'https://midtermproject160220.herokuapp.com/api/class/' + req.params.id + '/inviteUrl';
         return res.status(200).json({
             data : link,
         }) 
@@ -236,10 +236,8 @@ exports.decodeLink = (req,res) => {
         Classroom.findOne({_id : req.params.id})
         .exec((err, cls) => {
             if (cls){
-                console.log("ple1")
                 for (let i=0; i < cls.attendantList.length ;i++){
                     if (cls.attendantList[i]._id == req.user._id){
-                        console.log("ple2")
                         return res.status(200).json({
                             message: "User has been added",
                         })
@@ -248,7 +246,6 @@ exports.decodeLink = (req,res) => {
                 User.findOne({_id: req.user._id})
                 .exec((err,user) => {
                     cls.attendantList.push(user);
-                    console.log("ple3")
                     cls.save( function(err){
                         if(err) return res.status(500).send(err);
                         return res.status(200).send({message: "OK"})
@@ -263,7 +260,7 @@ exports.decodeLink = (req,res) => {
         
     }else{
         return res.status(400).json({
-            err: "err",
+            message: "Please login",
         })
     }
 }
