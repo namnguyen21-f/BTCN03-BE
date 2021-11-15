@@ -32,7 +32,7 @@ exports.createNewClass = (req, res) => {
                     teacher: teacher,
                     createdBy: req.user._id,
                     createdByName: req.user.userName,
-                    attendantList: [],
+                    attendantList: [user],
                 })
             
             
@@ -79,6 +79,52 @@ exports.getAllClass = (req, res) => {
         }
 
     })
+}
+
+exports.getClassAtendance = (req, res) => {
+    if (req.user){
+        Classroom.findOne({_id: req.params.id}).sort({"createdAt": -1})
+        .exec((err, cls) => {
+            if (err){
+                return res.status(400).json({
+                    err: err,
+                })
+            }else{
+                let flag = 0;
+                for (let i=0; i < cls.attendantList.length ;i++){
+                    if (cls.attendantList[i]._id == req.user._id){
+                        flag = 1;
+                        break;
+                    }
+                }
+                if (flag == 1){
+                    let t_arr = [];
+                    let s_arr = [];
+                    for (let i=0; i < cls.attendantList.length ;i++){
+                        let {firstName, lastName, email} = cls.attendantList[i];
+                        if (cls.attendantList[i].role == "teacher"){
+                            t_arr.push({firstName, lastName, email})
+                        }else if (cls.attendantList[i].role == "user"){
+                            s_arr.push({firstName, lastName, email})
+                        }
+                    }
+                    return res.status(400).json({
+                        data: {s_arr, t_arr}
+                    })
+                }else{
+                    return res.status(400).json({
+                        message: "Request Failed"
+                    })
+                }
+                
+            }
+
+        })
+    }else{
+        return res.status(400).json({
+            message: "Please login",
+        })
+    }
 }
 
 exports.getSpecificClass = (req, res) => {
@@ -169,6 +215,57 @@ exports.sendInvitationLink = (req,res) => {
         })
     }
     
+}
+
+exports.generateLink = (req,res) => {
+    if (req.user){
+        const link = 'https://btcn03-18127160.herokuapp.com/api/class/' + req.params.id + '/invite/url';
+        return res.status(200).json({
+            data : link,
+        }) 
+    }else{
+        return res.status(400).json({
+            err: "err",
+        })
+    }
+    
+}
+
+exports.decodeLink = (req,res) => {
+    if (req.user){
+        Classroom.findOne({_id : req.params.id})
+        .exec((err, cls) => {
+            if (cls){
+                console.log("ple1")
+                for (let i=0; i < cls.attendantList.length ;i++){
+                    if (cls.attendantList[i]._id == req.user._id){
+                        console.log("ple2")
+                        return res.status(200).json({
+                            message: "User has been added",
+                        })
+                    }
+                }
+                User.findOne({_id: req.user._id})
+                .exec((err,user) => {
+                    cls.attendantList.push(user);
+                    console.log("ple3")
+                    cls.save( function(err){
+                        if(err) return res.status(500).send(err);
+                        return res.status(200).send({message: "OK"})
+                    })
+                })
+            }else{
+                return res.status(400).json({
+                    message: "Classrom does not exist",
+                })
+            }
+        })
+        
+    }else{
+        return res.status(400).json({
+            err: "err",
+        })
+    }
 }
 
 
