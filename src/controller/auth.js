@@ -204,4 +204,59 @@ exports.facebookLogin= async (req, res)=>{
 }
 
 
+exports.manageProfile = (req,res) =>{
+    const {
+        firstName,
+        lastName,
+        password,
+        userName,
+        phone,
+        role
+    } = req.body;
+
+    if (req.user){
+        User.findOne({_id: req.user._id})
+        .exec((err,user) => {
+            if (err){
+                return res.status(400).json({
+                    err: err,
+                })
+            }
+            if (!user){
+                return res.status(400).json({
+                    message: "User is not valid",
+                })
+            }else{
+                user.firstName = firstName;
+                user.lastName = lastName;
+                user.password = password;
+                user.userName = userName;
+                user.phone = phone;
+                //user.role = role;         
+                user.save((err,data) => {
+                    if (err){
+                        return res.status(400).json({
+                            message: "Something Wrong",
+                            err: err,
+                        })
+                    }else{
+                        return res.status(201).json({
+                            message: "Done",
+                        })
+                    } 
+                })
+                
+            }
+        })
+    }else{
+        return res.status(400).json({
+            message: "Request Failed",
+        })
+    }
+    
+}
+
+
+
+
 

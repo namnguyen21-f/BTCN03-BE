@@ -4,7 +4,7 @@ const router = express.Router();
 
 const {createNewClass, getAllClass,getSpecificClass , generateLink, decodeLink
         , sendInvitationLink,readInvitationLink, joininClass, getClassAtendance} = require("../controller/classroom");
-const {signin,signup, facebookLogin, googleLogin} = require("../controller/auth");
+const {signin,signup, facebookLogin, googleLogin, manageProfile} = require("../controller/auth");
 
 // const {addStock ,getStockList, getStockStatistic ,getStockProfit , getUserCurrentStock, getStockTransactionMonth} = require("../controller/stock");
 
@@ -31,14 +31,13 @@ router.get('/class/:id' , getSpecificClass);
 router.post('/facebookLogin', facebookLogin);
 router.post('/googleLogin', googleLogin);
 
+router.get('/class/:classId/invite/:id' , readInvitationLink);
 router.post('/class/:id/invite' , sendInvitationLink);
-router.post('/class/:id/inviteUrl' , generateLink);
-router.get('/class/:id/inviteUrl' , decodeLink);
-
 
 router.post('/class/:id/join' , joininClass);
 
-router.get('/class/:classId/invite/:id' , readInvitationLink);
+router.post('/class/:id/inviteUrl' , generateLink);
+router.get('/class/:id/inviteUrl' , decodeLink);
 
 // router.post('/addStock' , addStock);
 
