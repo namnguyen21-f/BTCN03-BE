@@ -14,6 +14,7 @@ var smtpTransport = nodemailer.createTransport({
 });
 
 exports.createNewClass = (req, res) => {
+    console.log(req.user)
     if (req.user){
         User.findOne({_id: req.user._id})
         .exec((err,user) => {
@@ -52,8 +53,8 @@ exports.createNewClass = (req, res) => {
             }
         })
     }else{
-        return res.status(200).json({
-            data: classList,
+        return res.status(400).json({
+            err: "rror",
         })
     }
     
