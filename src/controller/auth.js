@@ -211,7 +211,6 @@ exports.manageProfile = (req,res) =>{
         password,
         userName,
         phone,
-        role
     } = req.body;
 
     if (req.user){

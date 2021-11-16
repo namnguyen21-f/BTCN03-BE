@@ -10,7 +10,6 @@ const {signin,signup, facebookLogin, googleLogin, manageProfile} = require("../c
 // const {addStock ,getStockList, getStockStatistic ,getStockProfit , getUserCurrentStock, getStockTransactionMonth} = require("../controller/stock");
 
 function atc (req,res){
-    console.log(req.user)
     if (req.user != undefined){
         return res.status(200).json({
             message: "Token validated",
@@ -25,6 +24,7 @@ function atc (req,res){
 router.post('/atc' , atc);
 router.post('/signin' , signin);
 router.post('/signup' , signup);
+router.post('/changeProfile' , manageProfile);
 router.post('/class/new' , createNewClass);
 router.post('/class/:id/getClassAte' , getClassAtendance);
 router.get('/class/getAll' , getAllClass);
@@ -41,6 +41,7 @@ router.post('/class/:id/inviteUrl' , generateLink);
 router.get('/class/:id/inviteUrl' , decodeLink);
 
 router.get('/class/:id/classDetail', classDetail);
+
 
 // router.post('/addStock' , addStock);
 
