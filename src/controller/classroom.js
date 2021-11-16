@@ -369,7 +369,15 @@ exports.readInvitationLink = (req,res) => {
 }
 
 
-
+exports.classDetail= (req, res)=>{
+    Classroom.findOne({_id: req.params.id})
+    .exec((err, cls) => {
+        if(err){
+            return req.status(400).send(err);
+        }
+        return res.status(200).send(cls);
+    })
+}
 
 
 
