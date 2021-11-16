@@ -186,7 +186,7 @@ exports.sendInvitationLink = (req,res) => {
                         })
                     }else{
                         const to = req.body.email;
-                        const link = 'https://midtermproject160220.herokuapp.com/api/class' + req.params.id + '/invite/' + data._id;
+                        const link = 'https://midtermproject160220.herokuapp.com/api/class/' + req.params.id + '/invite/' + data._id;
                         var mailOptions = {
                             to: to,
                             subject: "Email for inviting user to class",
@@ -195,8 +195,10 @@ exports.sendInvitationLink = (req,res) => {
                 
                         smtpTransport.sendMail(mailOptions, function(error, info) {
                             if (error) {
-                                return res.status(400).json({
-                                    err: error,
+                                Invitation.deleteOne({_id: data._id} ,  function (err) {
+                                    return res.status(400).json({
+                                        message: "Request Failed",
+                                    })
                                 })
                             } else {
                                 return res.status(200).json({
