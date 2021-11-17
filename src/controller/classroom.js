@@ -168,7 +168,7 @@ exports.sendInvitationLink = (req,res) => {
         Invitation.findOne({toEmail : req.body.email})
         .exec((err, ivt) => {
             if (ivt){
-                return res.status(400).json({
+                return res.status(200).json({
                     message: "Invitation already been sent",
                 })
             }else{
@@ -186,7 +186,7 @@ exports.sendInvitationLink = (req,res) => {
                         })
                     }else{
                         const to = req.body.email;
-                        const link = 'https://midtermproject160220.herokuapp.com/api/class/' + req.params.id + '/invite/' + data._id;
+                        const link = 'https://midtermproject160220.herokuapp.com/class/' + req.params.id + '/invite/' + data._id;
                         var mailOptions = {
                             to: to,
                             subject: "Email for inviting user to class",
