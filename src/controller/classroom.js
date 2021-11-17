@@ -109,7 +109,7 @@ exports.getClassAtendance = (req, res) => {
                             s_arr.push({firstName, lastName, email})
                         }
                     }
-                    return res.status(400).json({
+                    return res.status(200).json({
                         data: {s_arr, t_arr}
                     })
                 }else{
