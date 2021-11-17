@@ -222,7 +222,7 @@ exports.sendInvitationLink = (req,res) => {
 
 exports.generateLink = (req,res) => {
     if (req.user){
-        const link = 'https://midtermproject160220.herokuapp.com/api/class/' + req.params.id + '/inviteUrl';
+        const link = 'https://midtermproject160220.herokuapp.com/class/' + req.params.id + '/inviteUrl';
         return res.status(200).json({
             data : link,
         }) 
