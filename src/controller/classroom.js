@@ -198,6 +198,7 @@ exports.sendInvitationLink = (req,res) => {
                                 Invitation.deleteOne({_id: data._id} ,  function (err) {
                                     return res.status(400).json({
                                         message: "Request Failed",
+                                        error : error,
                                     })
                                 })
                             } else {
