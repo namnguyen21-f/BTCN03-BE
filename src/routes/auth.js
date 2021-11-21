@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 const {createNewClass, getAllClass,getSpecificClass , generateLink, decodeLink
-        , sendInvitationLink,readInvitationLink, joininClass, getClassAtendance, classDetail} = require("../controller/classroom");
+        , sendInvitationLink,readInvitationLink, joininClass, getClassAtendance, classDetail, classGrade} = require("../controller/classroom");
 const {signin,signup, facebookLogin, googleLogin, manageProfile} = require("../controller/auth");
 
 
@@ -41,6 +41,7 @@ router.post('/class/:id/inviteUrl' , generateLink);
 router.get('/class/:id/inviteUrl' , decodeLink);
 
 router.get('/class/:id/classDetail', classDetail);
+router.get('class/:id/structuralGrade', classGrade);
 
 
 // router.post('/addStock' , addStock);

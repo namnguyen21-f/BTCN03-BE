@@ -14,7 +14,6 @@ var smtpTransport = nodemailer.createTransport({
 });
 
 exports.createNewClass = (req, res) => {
-    console.log(req.user)
     if (req.user){
         User.findOne({_id: req.user._id})
         .exec((err,user) => {
@@ -83,6 +82,7 @@ exports.getAllClass = (req, res) => {
 }
 
 exports.getClassAtendance = (req, res) => {
+    // return res.status(200).json({req});
     if (req.user){
         Classroom.findOne({_id: req.params.id}).sort({"createdAt": -1})
         .exec((err, cls) => {
@@ -382,5 +382,7 @@ exports.classDetail= (req, res)=>{
     })
 }
 
-
+exports.classGrade= (req, res)=>{
+    return;
+}
 
