@@ -1,6 +1,7 @@
 const Classroom = require("../models/classroom");
 const User = require("../models/user");
 const Invitation = require("../models/invitation");
+const GradeForm = require("../models/gradeForm");
 
 var nodemailer = require("nodemailer");
 
@@ -382,7 +383,7 @@ exports.classDetail= (req, res)=>{
     })
 }
 
-exports.classGrade= (req, res)=>{
+exports.gradeNew= (req, res)=>{
     return;
 }
 
