@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const User = require('./user').schema;
+const Assignment = require('./assignment').schema;
 
 const ckSchema = new mongoose.Schema({ 
     classId: {
@@ -27,6 +28,7 @@ const ckSchema = new mongoose.Schema({
         require: true,
     },
     attendantList: [{type: User}],
+    assignmentList: [{type: Assignment}],
 },{timestamps: true});
 
 

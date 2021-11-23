@@ -2,7 +2,7 @@ const Classroom = require("../models/classroom");
 const User = require("../models/user");
 const Invitation = require("../models/invitation");
 const GradeForm = require("../models/gradeForm");
-
+const Assignment = require("../models/assignment");
 var nodemailer = require("nodemailer");
 
 
@@ -383,6 +383,7 @@ exports.classDetail= (req, res)=>{
     })
 }
 
+
 exports.gradeNew= (req, res)=>{
     if (req.user){
         User.findOne({_id: req.user._id})
@@ -428,4 +429,58 @@ exports.gradeNew= (req, res)=>{
     }
     
 }
+
+exports.newAssignment= (req, res)=>{
+    if (req.user){
+        User.findOne({_id: req.user._id})
+        .exec((err,user) => {
+            if (user.role == "user"){
+                return res.status(400).json({
+                    message: "Student does not have permisson",
+                })
+            }else{
+                const {
+                    fieldArray,
+                    name,
+                } = req.body;
+
+                //fieldArray:  [{name: "Final term" , grade: "2"}]
+                
+                const newAssignment = new Assignment({
+                    classId: req.params.id,
+                    name: name,
+                    fieldArray: fieldArray,
+                    createdBy: user._id
+                })
+
+                newAssignment.save((err,data) => {
+                    if (err){
+                        return res.status(400).json({
+                            message: "Something Wrong",
+                            err: err,
+                        })
+                    }else{
+                        Classroom.findOne({_id : req.params.id})
+                        .exec((err, cls) => {
+                            cls.assignmentList.push(data);
+                            cls.save( function(err){
+                                if(err) return res.status(500).send(err);
+                                return res.status(200).send({message: "OK"})
+                            })
+                        })
+                    } 
+                })
+            }
+        })
+    }else{
+        return res.status(400).json({
+            err: "Error",
+        })
+    }
+    
+}
+
+
+
+
 

@@ -1,17 +1,16 @@
 const mongoose = require('mongoose');
 
-
-const grade = new mongoose.Schema({ 
+const assignment = new mongoose.Schema({ 
     classId: {
         type: String,
         require: true,
     },
-    nameItem: {
+    name: {
         type: String,
         require: true
     },
-    gradeItem: {
-        type: Number,
+    fieldArray: {
+        type: Array,
         require: true
     },
     createdBy: {
@@ -20,4 +19,4 @@ const grade = new mongoose.Schema({
     },
 },{timestamps: true});
 
-module.exports = mongoose.model("GradeForm", grade);
+module.exports = mongoose.model("Assignment", assignment);
