@@ -12,7 +12,7 @@ const grade = new mongoose.Schema({
     },
     gradeItem: {
         type: Number,
-        require: true
+        require: true 
     },
     createdBy: {
         type: String,

@@ -415,7 +415,7 @@ exports.gradeNew= (req, res)=>{
                         })
                     }else{
                         return res.status(201).json({
-                            gradeItem: data,
+                            gradeForm: data,
                             message: "Success"
                         })
                     } 
