@@ -50,7 +50,7 @@ router.post('/class/:id/newAssignment', newAssignment);
 
 
 router.post('/grade/new', gradeNew);
-router.get('/:id/gradeAll', getAllGrade);
+
 
 
 // router.post('/addStock' , addStock);
