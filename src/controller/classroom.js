@@ -384,6 +384,48 @@ exports.classDetail= (req, res)=>{
 }
 
 exports.gradeNew= (req, res)=>{
-    return;
+    if (req.user){
+        User.findOne({_id: req.user._id})
+        .exec((err,user) => {
+            if (user.role == "user"){
+                return res.status(400).json({
+                    message: "Student does not have permisson",
+                })
+            }else{
+                const {
+                    classId,
+                    gradeName,
+                    grade
+                } = req.body;
+                
+                const newItemGrade = new GradeForm({
+                    classId: classId,
+                    nameItem: gradeName,
+                    gradeItem: grade,
+                    createdBy: user._id
+                })
+            
+            
+                newItemGrade.save((err,data) => {
+                    if (err){
+                        return res.status(400).json({
+                            message: "Something Wrong",
+                            err: err,
+                        })
+                    }else{
+                        return res.status(201).json({
+                            gradeItem: data,
+                            message: "Success"
+                        })
+                    } 
+                })
+            }
+        })
+    }else{
+        return res.status(400).json({
+            err: "Error",
+        })
+    }
+    
 }
 

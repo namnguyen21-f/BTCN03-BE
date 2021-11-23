@@ -41,7 +41,7 @@ router.post('/class/:id/inviteUrl' , generateLink);
 router.get('/class/:id/inviteUrl' , decodeLink);
 
 router.get('/class/:id/classDetail', classDetail);
-router.post('/:id/grade/new', gradeNew);
+router.post('/grade/new', gradeNew);
 
 
 // router.post('/addStock' , addStock);
