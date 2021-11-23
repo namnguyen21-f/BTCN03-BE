@@ -414,7 +414,7 @@ exports.gradeNew= (req, res)=>{
                         })
                     }else{
                         return res.status(201).json({
-                            gradeItem: data,
+                            gradeForm: data,
                             message: "Success"
                         })
                     } 
@@ -429,3 +429,22 @@ exports.gradeNew= (req, res)=>{
     
 }
 
+exports.getAllGrade= (req, res)=>{
+    GradeForm.find({classId: req.params.id}).sort({"createdAt": -1})
+    .exec((err, classList) => {
+        classList.map(ele => {
+            ele.updatedAt = null;
+            ele.createdAt= null;
+        });
+        if (err){
+            return res.status(400).json({
+                err: err,
+            })
+        }else{
+            return res.status(200).json({
+                data: classList,
+            })
+        }
+
+    })
+}
