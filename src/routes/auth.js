@@ -4,7 +4,7 @@ const router = express.Router();
 
 const {createNewClass, getAllClass,getSpecificClass , generateLink, decodeLink
         , sendInvitationLink,readInvitationLink, joininClass, getClassAtendance, classDetail,
-             gradeNew, newAssignment} = require("../controller/classroom");
+             gradeNew, newAssignment , removeAssignment, updateAssignment} = require("../controller/classroom");
 const {signin,signup, facebookLogin, googleLogin, manageProfile} = require("../controller/auth");
 
 
@@ -45,6 +45,9 @@ router.get('/class/:id/classDetail', classDetail);
 
 
 router.post('/class/:id/newAssignment', newAssignment);
+router.post('/class/:classId/:assId/remove', removeAssignment);
+router.post('/class/:classId/:assId/update', updateAssignment);
+
 
 
 

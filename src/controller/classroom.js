@@ -480,6 +480,84 @@ exports.newAssignment= (req, res)=>{
     
 }
 
+exports.removeAssignment= (req, res)=>{
+    if (req.user){
+        User.findOne({_id: req.user._id})
+        .exec((err,user) => {
+            if (user.role == "user"){
+                return res.status(400).json({
+                    message: "Student does not have permisson",
+                })
+            }else{
+                Assignment.findOneAndRemove({_id: req.params.assId})
+                .exec((err, ass) => {
+                    if (err){
+                        return res.status(400).json({
+                            message: "Something Wrong",
+                            err: err,
+                        })
+                    }else{
+                        Classroom.findOne({_id : req.params.classId})
+                        .exec((err, cls) => {
+                            cls.assignmentList = cls.assignmentList.filter(data => data._id != req.params.assId);
+                            cls.save( function(err){
+                                if(err) return res.status(500).send(err);
+                                return res.status(200).send({message: "OK"})
+                            })
+                        })
+                    } 
+                })
+            }
+        })
+    }else{
+        return res.status(400).json({
+            err: "Error",
+        })
+    }
+    
+}
+
+exports.updateAssignment= (req, res)=>{
+    if (req.user){
+        User.findOne({_id: req.user._id})
+        .exec((err,user) => {
+            if (user.role == "user"){
+                return res.status(400).json({
+                    message: "Student does not have permisson",
+                })
+            }else{
+                Assignment.findOne({_id: req.params.assId})
+                .exec((err, ass) => {
+                    if (err){
+                        return res.status(400).json({
+                            message: "Something Wrong",
+                            err: err,
+                        })
+                    }else{
+                        const {
+                            fieldArray,
+                            name,
+                        } = req.body;
+                        ass.name = name;
+                        ass.fieldArray = fieldArray;
+
+                        ass.save( function(err){
+                            if(err) return res.status(500).send(err);
+                            return res.status(200).send({message: "OK"})
+                        })
+                    } 
+                })
+            }
+        })
+    }else{
+        return res.status(400).json({
+            err: "Error",
+        })
+    }
+    
+}
+
+
 
 
 
