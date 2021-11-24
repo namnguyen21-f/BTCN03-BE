@@ -52,10 +52,6 @@ router.post('/class/:classId/:assId/update', updateAssignment);
 
 
 
-router.post('/grade/new', gradeNew);
-
-
-
 // router.post('/addStock' , addStock);
 
 
