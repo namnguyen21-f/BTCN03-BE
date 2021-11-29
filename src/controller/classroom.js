@@ -3,8 +3,8 @@ const User = require("../models/user");
 const Invitation = require("../models/invitation");
 const Assignment = require("../models/assignment");
 var nodemailer = require("nodemailer");
-
-
+const excel = require("exceljs");
+const excelToJson = require('convert-excel-to-json');
 var smtpTransport = nodemailer.createTransport({
     service: "Gmail",
     auth: {
@@ -31,8 +31,9 @@ exports.createNewClass = (req, res) => {
                     className: className,
                     teacher: teacher,
                     createdBy: req.user._id,
-                    createdByName: req.user.userName,
                     attendantList: [user],
+                    structGrade: [],
+                    studentList: [],
                 })
             
             
@@ -126,6 +127,212 @@ exports.getClassAtendance = (req, res) => {
             message: "Please login",
         })
     }
+}
+
+exports.getExcelStudentList = (req, res) => {
+    // return res.status(200).json({req});
+    if (req.user){
+        Classroom.findOne({_id: req.params.id}).sort({"createdAt": -1})
+        .exec((err, cls) => {
+            if (err){
+                return res.status(400).json({
+                    err: err,
+                })
+            }else{
+                let flag = 1;
+                if (flag == 1){
+                    let workbook = new excel.Workbook();
+                    let worksheet = workbook.addWorksheet("StudentList");
+
+                    worksheet.columns = [
+                        { header: "Student Id", key: "studentId", width: 20 },
+                        { header: "Full Name", key: "fullName", width: 35 },
+                    ];
+
+                    worksheet.addRows(cls.studentList);
+
+                    res.setHeader(
+                        "Content-Type",
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    );
+                    res.setHeader(
+                        "Content-Disposition",
+                        "attachment; filename=" + "StudentList.xlsx"
+                    );
+
+                    return workbook.xlsx.write(res).then(function () {
+                        res.status(200).end();
+                    });
+                    
+                }else{
+                    return res.status(400).json({
+                        message: "Request Failed"
+                    })
+                }
+                
+            }
+
+        })
+    }else{
+        return res.status(400).json({
+            message: "Please login",
+        })
+    }
+}
+
+exports.uploadExcelStudentList = async (req, res) => {
+    if(!req.files) {
+        res.send({
+            status: 400,
+            message: 'No file uploaded'
+        });
+    } else {
+        if (req.user){
+            Classroom.findOne({_id: req.params.id}).sort({"createdAt": -1})
+            .exec( async (err, cls) => {
+                if (err){
+                    return res.status(400).json({
+                        err: err,
+                    })
+                }else{
+                    if (cls.createdBy !== req.user._id){
+                        return res.status(400).json({
+                            message: "You do not have permisstion",
+                        })
+                    }else{
+                        const order = req.files.files;
+                        const name = './uploads/' + order.name + Math.random() * 123456789 ;
+                        await order.mv(name);
+                        // Process your file
+                        var file = excelToJson({
+                            sourceFile: name,
+                        });
+                        var result = file.StudentList;
+                        if (result[0].A.trim() != "StudentId" || result[0].B.trim() != "FullName"){
+                            res.status(400).json({
+                                message: 'Excel is not valid'
+                            });
+                        }
+                        let arrtmp = [];
+                        for (let i=1 ; i < result.length ; i++ ){
+                            let tmp = {
+                                studentId : result[i].A, 
+                                fullName: result[i].B,
+                            };
+                            await User.findOne({ studentId: result[i].A }, function (err, doc) {
+                                if (doc){
+                                    tmp.user = {
+                                        studentId: doc.studentId,
+                                        userName : doc.userName,
+                                        email: doc.email,
+                                        id: doc._id,
+                                    }
+                                }
+                            });
+                            arrtmp.push(tmp)
+                        }
+                        // You can also use the mv() method to place the file in a upload directory (i.e. 'uploads')
+                        // Send response
+                        cls.studentList = arrtmp;
+
+                        cls.save( function(err){
+                            if(err) return res.status(500).send(err);
+                            return res.status(200).send({message: "OK"})
+                        })
+                    }
+                }
+            })
+        }else{
+            return res.status(400).json({
+                message: "Please login",
+            })
+        }
+    }
+   
+    // return res.status(200).json({req});
+    
+}
+
+exports.uploadExcelAssignmentGrade = async (req, res) => {
+    if(!req.files) {
+        res.send({
+            status: 400,
+            message: 'No file uploaded'
+        });
+    } else {
+        if (req.user){
+            Classroom.findOne({_id: req.params.classId}).sort({"createdAt": -1})
+            .exec((err, cls) => {
+                if (err){
+                    return res.status(400).json({
+                        err: err,
+                    })
+                }else{
+                    Assignment.findOne({_id: req.params.assId}).sort({"createdAt": -1})
+                    .exec(async (err, ass) => {
+                        if (err){
+                            return res.status(400).json({
+                                err: err,
+                            })
+                        }else{
+                            if (ass.createdBy !== req.user._id){
+                                return res.status(400).json({
+                                    message: "You do not have permisstion",
+                                })
+                            }else{
+                                const order = req.files.files;
+                                const name = './uploads/' + order.name + Math.random() * 123456789 ;
+                                await order.mv(name);
+                                // Process your file
+                                var file = excelToJson({
+                                    sourceFile: name,
+                                });
+                                var result = file.StudentList;
+                                if (result[0].A.trim() != "StudentId" || result[0].B.trim() != "Grade"){
+                                    res.status(400).json({
+                                        message: 'Excel is not valid'
+                                    });
+                                }
+                                let arrtmp = [];
+                                for (let i=1 ; i < result.length ; i++ ){
+                                    let tmp = {
+                                        studentId : result[i].A, 
+                                        grade: result[i].B,
+                                    };
+                                    await User.findOne({ studentId: result[i].A }, function (err, doc) {
+                                        if (doc){
+                                            tmp.user = {
+                                                studentId: doc.studentId,
+                                                userName : doc.userName,
+                                                email: doc.email,
+                                                id: doc._id,
+                                            }
+                                        }
+                                    });
+                                    arrtmp.push(tmp)
+                                }
+                                // You can also use the mv() method to place the file in a upload directory (i.e. 'uploads')
+                                // Send response
+                                ass.studentGrade = arrtmp;
+        
+                                ass.save( function(err){
+                                    if(err) return res.status(500).send(err);
+                                    return res.status(200).send({message: "OK"})
+                                })
+                            }
+                        }
+                    })
+                }
+            })
+        }else{
+            return res.status(400).json({
+                message: "Please login",
+            })
+        }
+    }
+   
+    // return res.status(200).json({req});
+    
 }
 
 exports.getSpecificClass = (req, res) => {
@@ -395,6 +602,7 @@ exports.newAssignment= (req, res)=>{
                 const {
                     fieldArray,
                     name,
+                    grade
                 } = req.body;
 
                 //fieldArray:  [{name: "Final term" , grade: "2"}]
@@ -402,6 +610,7 @@ exports.newAssignment= (req, res)=>{
                 const newAssignment = new Assignment({
                     classId: req.params.id,
                     name: name,
+                    grade: grade,
                     fieldArray: fieldArray,
                     createdBy: user._id
                 })
@@ -509,6 +718,115 @@ exports.updateAssignment= (req, res)=>{
     }
     
 }
+
+exports.getExcelAssignment= (req, res)=>{
+    if (req.user){
+        User.findOne({_id: req.user._id})
+        .exec((err,user) => {
+            Assignment.findOne({_id: req.params.assId})
+            .exec((err, ass) => {
+                if (err){
+                    return res.status(400).json({
+                        message: "Something Wrong",
+                        err: err,
+                    })
+                }else{
+                    let workbook = new excel.Workbook();
+                    let worksheet = workbook.addWorksheet("StudentList");
+
+                    worksheet.columns = [
+                        { header: "Task", key: "gradeText", width: 35 },
+                        { header: "Grade", key: "grade", width: 15 },
+                    ];
+
+                    worksheet.addRows(ass.fieldArray);
+
+                    res.setHeader(
+                        "Content-Type",
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    );
+                    res.setHeader(
+                        "Content-Disposition",
+                        "attachment; filename=" + `Assignment ${ass.name}.xlsx`
+                    );
+
+                    return workbook.xlsx.write(res).then(function () {
+                        res.status(200).end();
+                    });
+                } 
+            })
+        })
+    }else{
+        return res.status(400).json({
+            err: "Error",
+        })
+    }
+    
+}
+
+
+exports.getTemplateStudentList = (req, res) => {
+    // return res.status(200).json({req});
+    if (req.user){
+        let workbook = new excel.Workbook();
+        let worksheet = workbook.addWorksheet("StudentList");
+
+        worksheet.columns = [
+            { header: "StudentId", key: "studentId", width: 20 },
+            { header: "FullName", key: "fullName", width: 35 },
+        ];
+
+        res.setHeader(
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        res.setHeader(
+            "Content-Disposition",
+            "attachment; filename=" + "StudentList.xlsx"
+        );
+
+        return workbook.xlsx.write(res).then(function () {
+            res.status(200).end();
+        });
+    }else{
+        return res.status(400).json({
+            message: "Please login",
+        })
+    }
+}
+
+exports.getTemplateAsGrade = (req, res) => {
+    // return res.status(200).json({req});
+    if (req.user){
+        let workbook = new excel.Workbook();
+        let worksheet = workbook.addWorksheet("StudentList");
+
+        worksheet.columns = [
+            { header: "StudentId", key: "studentId", width: 20 },
+            { header: "Grade", key: "grade", width: 35 },
+        ];
+
+        res.setHeader(
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        res.setHeader(
+            "Content-Disposition",
+            "attachment; filename=" + "StudentList.xlsx"
+        );
+
+        return workbook.xlsx.write(res).then(function () {
+            res.status(200).end();
+        });
+    }else{
+        return res.status(400).json({
+            message: "Please login",
+        })
+    }
+}
+
+//uploadExcelStudentList
+
 
 
 

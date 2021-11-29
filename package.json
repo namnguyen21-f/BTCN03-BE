@@ -7,7 +7,7 @@
     "node": "12.11.1"
   },
   "scripts": {
-    "start": "node ./src/index.server.js"
+    "start": "nodemon ./src/index.server.js"
   },
   "keywords": [
     "ecommerce",
@@ -20,16 +20,20 @@
     "axios": "^0.24.0",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
+    "convert-excel-to-json": "^1.7.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
+    "exceljs": "^4.3.0",
     "express": "^4.17.1",
+    "express-fileupload": "^1.2.1",
     "express-validator": "^6.11.1",
     "google-auth-library": "^7.10.2",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.10",
-    "nodemailer": "^6.7.0",
     "node-fetch": "^3.1.0",
-    "save": "^2.4.0"
+    "nodemailer": "^6.7.0",
+    "save": "^2.4.0",
+    "xlsx": "^0.17.4"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"

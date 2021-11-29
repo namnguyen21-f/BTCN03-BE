@@ -4,7 +4,9 @@ const router = express.Router();
 
 const {createNewClass, getAllClass,getSpecificClass , generateLink, decodeLink
         , sendInvitationLink,readInvitationLink, joininClass, getClassAtendance, classDetail,
-             gradeNew, newAssignment , removeAssignment, updateAssignment} = require("../controller/classroom");
+             gradeNew, newAssignment , removeAssignment, updateAssignment, getExcelStudentList,
+             getExcelAssignment ,uploadExcelStudentList ,getTemplateStudentList , getTemplateAsGrade,
+             uploadExcelAssignmentGrade } = require("../controller/classroom");
 const {signin,signup, facebookLogin, googleLogin, manageProfile} = require("../controller/auth");
 
 
@@ -27,7 +29,7 @@ router.post('/signin' , signin);
 router.post('/signup' , signup);
 router.post('/changeProfile' , manageProfile);
 router.post('/class/new' , createNewClass);
-router.post('/class/:id/getClassAte' , getClassAtendance);
+router.get('/class/:id/getClassAte' , getClassAtendance);
 router.get('/class/getAll' , getAllClass);
 router.get('/class/:id' , getSpecificClass);
 router.post('/facebookLogin', facebookLogin);
@@ -44,11 +46,21 @@ router.get('/class/:id/inviteUrl' , decodeLink);
 router.get('/class/:id/classDetail', classDetail);
 
 
+
+
 router.post('/class/:id/newAssignment', newAssignment);
 router.post('/class/:classId/:assId/remove', removeAssignment);
 router.post('/class/:classId/:assId/update', updateAssignment);
+router.post('/class/:classId/:assId/upload/grade', uploadExcelAssignmentGrade);
 
 
+router.get('/class/:id/getSL/xlsx', getExcelStudentList);
+router.get('/class/:classId/:assId/download/xlsx', getExcelAssignment);
+router.post('/class/:id/uploadSL/xlsx', uploadExcelStudentList);
+
+
+router.get('/class/grade/template', getTemplateAsGrade);
+router.get('/class/sl/template', getTemplateStudentList);
 
 
 

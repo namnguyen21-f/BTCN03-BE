@@ -53,6 +53,10 @@ const userSchema = new mongoose.Schema({
     cartId: {
         type: String,
         trim: true,
+    },
+    studentId: {
+        type: String,
+        trim: true,
     }
 },{timestamps: true});
 

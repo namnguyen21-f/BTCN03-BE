@@ -3,6 +3,7 @@ const app = express();
 const env = require("dotenv");
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
+const fileUpload = require('express-fileupload');
 var cors = require('cors')
 
 //routers
@@ -15,6 +16,13 @@ app.use(express.json());
 app.use(express.urlencoded({
     extended: true
 }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(fileUpload({
+    limits: { fileSize: 50 * 1024 * 1024 },
+    createParentPath: true
+}))
+
 
 const uri = process.env.MONGODB_URI || "mongodb+srv://Admin:viH6ZogRwtSAW9tT@cluster0.mpci4.mongodb.net/Ecommerce?retryWrites=true&w=majority";
 //|| 

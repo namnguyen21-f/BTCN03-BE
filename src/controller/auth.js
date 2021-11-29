@@ -22,7 +22,8 @@ exports.signup = (req,res) =>{
             password,
             userName,
             phone,
-            role
+            role,
+            studentId
         } = req.body;
         const newUser = new User({
             firstName : firstName,
@@ -32,6 +33,7 @@ exports.signup = (req,res) =>{
             userName: userName,
             phone: phone,
             role: role,
+            studentId: studentId,
         })
         newUser.save((err,data) => {
             if (err){
@@ -211,6 +213,7 @@ exports.manageProfile = (req,res) =>{
         password,
         userName,
         phone,
+        studentId
     } = req.body;
 
     if (req.user){
@@ -231,6 +234,7 @@ exports.manageProfile = (req,res) =>{
                 user.password = password;
                 user.userName = userName;
                 user.phone = phone;
+                user.studentId = studentId;
                 //user.role = role;         
                 user.save((err,data) => {
                     if (err){

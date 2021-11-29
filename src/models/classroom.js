@@ -23,12 +23,10 @@ const ckSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
-    createdByName: {
-        type: String,
-        require: true,
-    },
     attendantList: [{type: User}],
     assignmentList: [{type: Assignment}],
+    studentList: [],
+    structGrade: [],
 },{timestamps: true});
 
 
