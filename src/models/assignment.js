@@ -9,10 +9,10 @@ const assignment = new mongoose.Schema({
         type: String,
         require: true
     },
-    fieldArray: {
-        type: Array,
-        require: true
-    },
+    // fieldArray: {
+    //     type: Array,
+    //     require: true
+    // },
     createdBy: {
         type: String,
         require: true,
