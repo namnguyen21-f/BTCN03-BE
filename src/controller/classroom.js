@@ -335,6 +335,71 @@ exports.uploadExcelAssignmentGrade = async (req, res) => {
     
 }
 
+exports.uploadSpecificAssignmentGrade = async (req, res) => {
+    var grade = req.body.grade;
+    if (req.user){
+        Classroom.findOne({_id: req.params.classId}).sort({"createdAt": -1})
+        .exec((err, cls) => {
+            if (err){
+                return res.status(400).json({
+                    err: err,
+                })
+            }else{
+                Assignment.findOne({_id: req.params.assId}).sort({"createdAt": -1})
+                .exec(async (err, ass) => {
+                    if (err){
+                        return res.status(400).json({
+                            err: err,
+                        })
+                    }else{
+                        if (ass.createdBy !== req.user._id){
+                            return res.status(400).json({
+                                message: "You do not have permisstion",
+                            })
+                        }else{
+                            let result = ass.studentGrade;
+                            let flag = 0;
+
+                            for (let i=0 ; i < result.length ; i++ ){
+                                if (result[i].studentId == req.params.studentId){
+                                    flag = 1;
+                                 
+                                    
+                                    result[i].grade = parseInt(req.body.grade);
+                               
+                                    break;
+                                }
+                            }
+                            
+                            if (flag == 1){
+                                ass.studentGrade = [];
+                                ass.studentGrade = result;
+                                ass.save( function(err){
+                                    if(err) return res.status(500).send(err);
+                                    return res.status(200).send({message: "OK"})
+                                })
+                            }else{
+                                return res.status(400).json({
+                                    message: "Request Failed",
+                                })
+                            }
+                            // You can also use the mv() method to place the file in a upload directory (i.e. 'uploads')
+                            // Send response
+                            
+                        }
+                    }
+                })
+            }
+        })
+    }else{
+        return res.status(400).json({
+            message: "Please login",
+        })
+    }
+    // return res.status(200).json({req});
+    
+}
+
 exports.getSpecificClass = (req, res) => {
     Classroom.findOne({_id: req.params.id}).sort({"createdAt": -1})
     .exec((err, class1) => {
@@ -827,6 +892,65 @@ exports.getTemplateAsGrade = (req, res) => {
 
 //uploadExcelStudentList
 
+
+exports.getTotalGrade = async (req, res) => {
+    if (req.user){
+        Classroom.findOne({_id: req.params.classId}).sort({"createdAt": -1})
+        .exec(async(err, cls) => {
+            if (err){
+                return res.status(400).json({
+                    err: err,
+                })
+            }else{
+                for (let i=0 ;i < cls.assignmentList ; i++ ){
+                    await Assignment.findOne({_id: cls.assignmentList[i]._id}).sort({"createdAt": -1})
+                    .exec(async (err, ass) => {
+                        if (err){
+                            return res.status(400).json({
+                                err: err,
+                            })
+                        }else{
+                            let result = ass.studentGrade;
+                                let flag = 0;
+                                for (let i=0 ; i < result.length ; i++ ){
+                                    if (result[i].studentId == req.params.studentId){
+                                        flag = 1;
+                                    
+                                        
+                                        result[i].grade = parseInt(req.body.grade);
+                                
+                                        break;
+                                    }
+                                }
+                                
+                                if (flag == 1){
+                                    ass.studentGrade = [];
+                                    ass.studentGrade = result;
+                                    ass.save( function(err){
+                                        if(err) return res.status(500).send(err);
+                                        return res.status(200).send({message: "OK"})
+                                    })
+                                }else{
+                                    return res.status(400).json({
+                                        message: "Request Failed",
+                                    })
+                                }
+                                // You can also use the mv() method to place the file in a upload directory (i.e. 'uploads')
+                                // Send response
+                        }
+                    })
+                }
+                
+            }
+        })
+    }else{
+        return res.status(400).json({
+            message: "Please login",
+        })
+    }
+    // return res.status(200).json({req});
+    
+}
 
 
 
