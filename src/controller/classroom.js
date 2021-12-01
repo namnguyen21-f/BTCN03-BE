@@ -92,14 +92,14 @@ exports.getClassAtendance = (req, res) => {
                     err: err,
                 })
             }else{
-                let flag = 0;
-                for (let i=0; i < cls.attendantList.length ;i++){
-                    if (cls.attendantList[i]._id == req.user._id){
-                        flag = 1;
-                        break;
-                    }
-                }
-                if (flag == 1){
+                // let flag = 0;
+                // for (let i=0; i < cls.attendantList.length ;i++){
+                //     if (cls.attendantList[i]._id == req.user._id){
+                //         flag = 1;
+                //         break;
+                //     }
+                // }
+                // if (flag == 1){
                     let t_arr = [];
                     let s_arr = [];
                     for (let i=0; i < cls.attendantList.length ;i++){
@@ -113,11 +113,11 @@ exports.getClassAtendance = (req, res) => {
                     return res.status(200).json({
                         data: {s_arr, t_arr}
                     })
-                }else{
+                // }else{
                     return res.status(400).json({
                         message: "Request Failed"
                     })
-                }
+                // }
                 
             }
 
@@ -666,36 +666,41 @@ exports.newAssignment= (req, res)=>{
             }else{
                 const {
                     fieldArray,
-                    name,
-                    grade
+                    // name,
+                    // grade
                 } = req.body;
 
                 //fieldArray:  [{name: "Final term" , grade: "2"}]
-                
-                const newAssignment = new Assignment({
-                    classId: req.params.id,
-                    name: name,
-                    grade: grade,
-                    fieldArray: fieldArray,
-                    createdBy: user._id
-                })
+                console.log(fieldArray);
 
-                newAssignment.save((err,data) => {
-                    if (err){
-                        return res.status(400).json({
-                            message: "Something Wrong",
-                            err: err,
-                        })
-                    }else{
-                        Classroom.findOne({_id : req.params.id})
-                        .exec((err, cls) => {
-                            cls.assignmentList.push(data);
-                            cls.save( function(err){
-                                if(err) return res.status(500).send(err);
-                                return res.status(200).send({message: "OK"})
+                fieldArray.map((field)=>{
+                    const newAssignment = new Assignment({
+                        classId: req.params.id,
+                        // name: name,
+                        // grade: grade,
+                        // fieldArray: fieldArray,
+                        name: field.gradeText,
+                        grade: field.grade,
+                        createdBy: user._id
+                    })
+    
+                    newAssignment.save(async (err,data) => {
+                        if (err){
+                            return res.status(400).json({
+                                message: "Something Wrong",
+                                err: err,
                             })
-                        })
-                    } 
+                        }else{
+                            await Classroom.findOne({_id : req.params.id})
+                            .exec((err, cls) => {
+                                cls.assignmentList.push(data);
+                                cls.save( function(err){
+                                    if(err) return res.status(500).send(err);
+                                    return res.status(200).send({message: "OK"})
+                                })
+                            })
+                        } 
+                    })
                 })
             }
         })
