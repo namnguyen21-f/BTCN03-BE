@@ -658,7 +658,7 @@ exports.classDetail= (req, res)=>{
 exports.newAssignment= (req, res)=>{
     if (req.user){
         User.findOne({_id: req.user._id})
-        .exec((err,user) => {
+        .exec(async (err,user) => {
             if (user.role == "user"){
                 return res.status(400).json({
                     message: "Student does not have permisson",
@@ -670,38 +670,40 @@ exports.newAssignment= (req, res)=>{
                     // grade
                 } = req.body;
 
-                //fieldArray:  [{name: "Final term" , grade: "2"}]
-                console.log(fieldArray);
-
-                fieldArray.map((field)=>{
-                    const newAssignment = new Assignment({
-                        classId: req.params.id,
-                        // name: name,
-                        // grade: grade,
-                        // fieldArray: fieldArray,
-                        name: field.gradeText,
-                        grade: field.grade,
-                        createdBy: user._id
-                    })
-    
-                    newAssignment.save(async (err,data) => {
-                        if (err){
-                            return res.status(400).json({
-                                message: "Something Wrong",
-                                err: err,
-                            })
-                        }else{
-                            await Classroom.findOne({_id : req.params.id})
-                            .exec((err, cls) => {
-                                cls.assignmentList.push(data);
-                                cls.save( function(err){
-                                    if(err) return res.status(500).send(err);
-                                    return res.status(200).send({message: "OK"})
+                Classroom.findOne({_id : req.params.id})
+                .exec(async (err, cls) => {
+                    for (let i=0; i < fieldArray.length ;i++){
+                        let newAssignment = new Assignment({
+                            classId: req.params.id,
+                            // name: name,
+                            // grade: grade,
+                            // fieldArray: fieldArray,
+                            name: fieldArray[i].name,
+                            grade: fieldArray[i].grade,
+                            createdBy: req.user._id,
+                        })
+                        await newAssignment.save(async (err,data) => {
+                            if (err){
+                                return res.status(400).json({
+                                    message: "Something Wrong",
+                                    err: err,
                                 })
-                            })
-                        } 
-                    })
+                            }else{
+                                cls.assignmentList.push(data);
+                                if (i == fieldArray.length-1){
+                                    cls.save( function(err){
+                                        if(err) return res.status(500).send(err);
+                                        return res.status(200).send({message: "OK"})
+                                    })
+                                }
+                            } 
+                        })
+                    }
                 })
+
+                //fieldArray:  [{name: "Final term" , grade: "2"}]
+                
+
             }
         })
     }else{
