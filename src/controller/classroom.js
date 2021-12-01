@@ -896,51 +896,64 @@ exports.getTemplateAsGrade = (req, res) => {
 exports.getTotalGrade = async (req, res) => {
     if (req.user){
         Classroom.findOne({_id: req.params.classId}).sort({"createdAt": -1})
-        .exec(async(err, cls) => {
+        .exec(async (err, cls) => {
             if (err){
                 return res.status(400).json({
                     err: err,
                 })
             }else{
-                for (let i=0 ;i < cls.assignmentList ; i++ ){
-                    await Assignment.findOne({_id: cls.assignmentList[i]._id}).sort({"createdAt": -1})
-                    .exec(async (err, ass) => {
-                        if (err){
-                            return res.status(400).json({
-                                err: err,
-                            })
-                        }else{
-                            let result = ass.studentGrade;
-                                let flag = 0;
-                                for (let i=0 ; i < result.length ; i++ ){
-                                    if (result[i].studentId == req.params.studentId){
-                                        flag = 1;
-                                    
-                                        
-                                        result[i].grade = parseInt(req.body.grade);
-                                
-                                        break;
-                                    }
-                                }
-                                
-                                if (flag == 1){
-                                    ass.studentGrade = [];
-                                    ass.studentGrade = result;
-                                    ass.save( function(err){
-                                        if(err) return res.status(500).send(err);
-                                        return res.status(200).send({message: "OK"})
-                                    })
-                                }else{
-                                    return res.status(400).json({
-                                        message: "Request Failed",
-                                    })
-                                }
-                                // You can also use the mv() method to place the file in a upload directory (i.e. 'uploads')
-                                // Send response
-                        }
+                var sg_arr = [];
+
+                if (!cls.assignmentList){
+                    return res.status(200).json({
+                        data: [],
+                        message: "Assignment is empty"
                     })
                 }
-                
+
+                for (let i=0 ;i < cls.assignmentList.length ; i++ ){
+                    await Assignment.findOne({_id: cls.assignmentList[i]._id}).sort({"createdAt": -1})
+                    .exec((err, ass) => {
+                        let result = ass.studentGrade;
+                        for (let i=0 ; i < result.length ; i++ ){
+                            let tmp = sg_arr.findIndex(x => x.studentId == result[i].studentId);
+                            if (tmp != -1) {
+                                
+                                if (!sg_arr[tmp].grade){
+                                    sg_arr[tmp].grade = [];
+                                }
+                               
+                                sg_arr[tmp].grade.push({
+                                    name: ass.name,
+                                    grade: result[i].grade,
+                                })
+                             
+                                sg_arr[tmp].mean = sg_arr[tmp].mean + parseFloat((result[i].grade / ass.grade).toFixed(2));
+                            
+                            }else{
+                                sg_arr.push({
+                                    studentId: result[i].studentId,
+                                    grade: [{
+                                        name: ass.name,
+                                        grade: result[i].grade,
+                                    }],
+                                    mean: parseFloat((result[i].grade / ass.grade).toFixed(2)),
+                                })
+                            }
+                            
+                        }
+                        if (i == cls.assignmentList.length - 1){
+                                
+                            return res.status(200).json({
+                                data: sg_arr,
+                            })
+                        }
+                        // You can also use the mv() method to place the file in a upload directory (i.e. 'uploads')
+                        // Send response
+                    })
+                   
+                }
+             
             }
         })
     }else{
