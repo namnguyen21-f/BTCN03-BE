@@ -337,6 +337,9 @@ exports.uploadExcelAssignmentGrade = async (req, res) => {
 
 exports.uploadSpecificAssignmentGrade = async (req, res) => {
     var grade = req.body.grade;
+    var studentId = req.body.studentId;
+    var userId = req.body.userId;
+
     if (req.user){
         Classroom.findOne({_id: req.params.classId}).sort({"createdAt": -1})
         .exec((err, cls) => {
@@ -359,30 +362,50 @@ exports.uploadSpecificAssignmentGrade = async (req, res) => {
                         }else{
                             let result = ass.studentGrade;
                             let flag = 0;
-
-                            for (let i=0 ; i < result.length ; i++ ){
-                                if (result[i].studentId == req.params.studentId){
-                                    flag = 1;
-                                 
-                                    
-                                    result[i].grade = parseInt(req.body.grade);
-                               
-                                    break;
+                            if (ass.studentGrade){
+                                for (let i=0 ; i < result.length ; i++ ){
+                                    if (result[i].studentId == req.params.studentId){
+                                        flag = 1;
+                                        result[i].grade = parseInt(req.body.grade);
+                                        break;
+                                    }
                                 }
-                            }
-                            
-                            if (flag == 1){
-                                ass.studentGrade = [];
-                                ass.studentGrade = result;
+                                if (flag == 1){
+                                    ass.studentGrade = [];
+                                    ass.studentGrade = result;
+                                    ass.save( function(err){
+                                        if(err) return res.status(500).send(err);
+                                        return res.status(200).send({message: "OK"})
+                                    })
+                                }else{
+                                    ass.studentGrade.push({
+                                        studentId : studentId,
+                                        grade: grade,
+                                        user :{
+                                            id : userId,
+                                            studentId : studentId,
+                                        }
+                                    });
+                                    ass.save( function(err){
+                                        if(err) return res.status(500).send(err);
+                                        return res.status(200).send({message: "OK"})
+                                    })
+                                }
+                            }else{
+                                ass.studentGrade = [{
+                                    studentId : studentId,
+                                    grade: grade,
+                                    user :{
+                                        id : userId,
+                                        studentId : studentId,
+                                    }
+                                }];
                                 ass.save( function(err){
                                     if(err) return res.status(500).send(err);
                                     return res.status(200).send({message: "OK"})
                                 })
-                            }else{
-                                return res.status(400).json({
-                                    message: "Request Failed",
-                                })
                             }
+                           
                             // You can also use the mv() method to place the file in a upload directory (i.e. 'uploads')
                             // Send response
                             
@@ -847,7 +870,7 @@ exports.getTemplateStudentList = (req, res) => {
             { header: "StudentId", key: "studentId", width: 20 },
             { header: "FullName", key: "fullName", width: 35 },
         ];
-
+        res.setHeader('Access-Control-Expose-Headers', "Content-Disposition");
         res.setHeader(
             "Content-Type",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -877,14 +900,14 @@ exports.getTemplateAsGrade = (req, res) => {
             { header: "StudentId", key: "studentId", width: 20 },
             { header: "Grade", key: "grade", width: 35 },
         ];
-
+        res.setHeader('Access-Control-Expose-Headers', "Content-Disposition");
         res.setHeader(
             "Content-Type",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         );
         res.setHeader(
             "Content-Disposition",
-            "attachment; filename=" + "StudentList.xlsx"
+            "attachment; filename=" + "StudentGrade.xlsx"
         );
 
         return workbook.xlsx.write(res).then(function () {
