@@ -50,7 +50,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         trim: true,
     },
-    cartId: {
+    status: {
         type: String,
         trim: true,
     },

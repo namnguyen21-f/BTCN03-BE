@@ -66,7 +66,6 @@ exports.getAllClass = (req, res) => {
     .exec((err, classList) => {
         classList.map(ele => {
             ele.updatedAt = null;
-            ele.createdBy = null;
             ele.createdByName = null;
         });
         if (err){

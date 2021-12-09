@@ -7,27 +7,23 @@ const {createNewClass, getAllClass,getSpecificClass , generateLink, decodeLink
              gradeNew, newAssignment , removeAssignment, updateAssignment, getExcelStudentList,
              getExcelAssignment ,uploadExcelStudentList ,getTemplateStudentList , getTemplateAsGrade,
              uploadExcelAssignmentGrade, uploadSpecificAssignmentGrade , getTotalGrade} = require("../controller/classroom");
-const {signin,signup, facebookLogin, googleLogin, manageProfile} = require("../controller/auth");
+const {signin,signup, facebookLogin, googleLogin, manageProfile , 
+        banAccount, unbanAccount , atc , getAllAccount} = require("../controller/auth");
 
 
 // const {addStock ,getStockList, getStockStatistic ,getStockProfit , getUserCurrentStock, getStockTransactionMonth} = require("../controller/stock");
 
-function atc (req,res){
-    if (req.user != undefined){
-        return res.status(200).json({
-            message: "Token validated",
-        })
-    }else{
-        return res.status(200).json({
-            message: "Token failed",   
-        })
-    }
-}
+
 
 router.post('/atc' , atc);
 router.post('/signin' , signin);
 router.post('/signup' , signup);
 router.post('/changeProfile' , manageProfile);
+router.post('/admin/:userId/ban' , banAccount);
+router.post('/admin/:userId/unban' , unbanAccount);
+router.get('/admin/getAllAccount' , getAllAccount);
+
+
 router.post('/class/new' , createNewClass);
 router.get('/class/:id/getClassAte' , getClassAtendance);
 router.get('/class/getAll' , getAllClass);

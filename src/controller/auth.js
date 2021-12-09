@@ -56,6 +56,37 @@ exports.signup = (req,res) =>{
     })
 }
 
+exports.atc =  (req,res) => {
+    if (req.user != undefined){
+        User.findOne({_id: req.user._id})
+        .exec((err,user2) => {
+            if (err){
+                return res.status(400).json({
+                    message: "Token failed",
+                })
+            }
+            if (!user2){
+                return res.status(400).json({
+                    message: "Token failed",
+                })
+            }else{
+                user2.password = null;
+                user2.createdAt = null;
+                user2.updatedAt = null;
+                return res.status(200).json({
+                    message: "Token validated",
+                    user: user2,
+                })
+            }
+        })
+        
+    }else{
+        return res.status(200).json({
+            message: "Token failed",   
+        })
+    }
+}
+
 exports.signin = (req,res) =>{
     const {
         email,
@@ -73,6 +104,10 @@ exports.signin = (req,res) =>{
             return res.status(400).json({
                 message: "User is not registered",
             })
+        }else if (user.status == 'Banned'){
+            return res.status(400).json({
+                message: "Your account has been locked",
+            })
         }else{
             //authenticate is a async funtion
             user.authenticate(password).then(result => {
@@ -80,6 +115,7 @@ exports.signin = (req,res) =>{
                     return res.status(200).json({
                         message: "Login Successful",
                         token: jwt.sign({_id: user._id}, 'RESTFULAPIs' , { expiresIn: '2h'}),
+                        role: user.role,
                     })
                 }else{
                     return res.status(400).json({
@@ -258,6 +294,153 @@ exports.manageProfile = (req,res) =>{
     }
     
 }
+
+exports.getAllAccount = (req,res) =>{
+    if (req.user){
+        User.findOne({_id: req.user._id})
+        .exec((err,user) => {
+            if (err){
+                return res.status(400).json({
+                    err: err,
+                })
+            }
+            if (!user){
+                return res.status(400).json({
+                    message: "User is not valid",
+                })
+            }else if (user.role != "admin"){
+                return res.status(400).json({
+                    message: "You do not have permission",
+                })
+            }else{
+                User.find({}, function(err, users) {
+                    const result = users.filter(user => user.role != "admin");
+                    return res.status(200).json({
+                        data: result,
+                    })
+                });
+            }
+        })
+    }else{
+        return res.status(400).json({
+            message: "Request Failed",
+        })
+    }
+    
+}
+
+exports.banAccount = (req,res) =>{
+    if (req.user){
+        User.findOne({_id: req.user._id})
+        .exec((err,user) => {
+            if (err){
+                return res.status(400).json({
+                    err: err,
+                })
+            }
+            if (!user){
+                return res.status(400).json({
+                    message: "User is not valid",
+                })
+            }else if (user.role != "admin"){
+                return res.status(400).json({
+                    message: "You do not have permission",
+                })
+            }else{
+                User.findOne({_id: req.params.userId})
+                .exec((err,user2) => {
+                    if (err){
+                        return res.status(400).json({
+                            err: err,
+                        })
+                    }
+                    if (!user2){
+                        return res.status(400).json({
+                            message: "UserId does not found",
+                        })
+                    }else{
+                        user2.status = 'Banned';
+                        user2.save((err,data) => {
+                            if (err){
+                                return res.status(400).json({
+                                    message: "Something Wrong",
+                                    err: err,
+                                })
+                            }else{
+                                return res.status(201).json({
+                                    message: "Done",
+                                })
+                            } 
+                        })
+                    }
+                })
+            }
+        })
+    }else{
+        return res.status(400).json({
+            message: "Request Failed",
+        })
+    }
+    
+}
+
+exports.unbanAccount = (req,res) =>{
+    if (req.user){
+        User.findOne({_id: req.user._id})
+        .exec((err,user) => {
+            if (err){
+                return res.status(400).json({
+                    err: err,
+                })
+            }
+            if (!user){
+                return res.status(400).json({
+                    message: "User is not valid",
+                })
+            }else if (user.role != "admin"){
+                return res.status(400).json({
+                    message: "You do not have permission",
+                })
+            }else{
+                User.findOne({_id: req.params.userId})
+                .exec((err,user2) => {
+                    if (err){
+                        return res.status(400).json({
+                            err: err,
+                        })
+                    }
+                    if (!user2){
+                        return res.status(400).json({
+                            message: "UserId does not found",
+                        })
+                    }else{
+                        user2.status = 'Onboard';
+                        user2.save((err,data) => {
+                            if (err){
+                                return res.status(400).json({
+                                    message: "Something Wrong",
+                                    err: err,
+                                })
+                            }else{
+                                return res.status(201).json({
+                                    message: "Done",
+                                })
+                            } 
+                        })
+                    }
+                })
+            }
+        })
+    }else{
+        return res.status(400).json({
+            message: "Request Failed",
+        })
+    }
+    
+}
+
+
+
 
 
 
