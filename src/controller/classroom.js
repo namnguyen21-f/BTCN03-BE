@@ -993,6 +993,61 @@ exports.getTotalGrade = async (req, res) => {
     // return res.status(200).json({req});
     
 }
+//req.params.studentID
+
+exports.getStudentGrade = async (req, res) => {
+    if (req.user){
+        Classroom.findOne({_id: req.params.classId}).sort({"createdAt": -1})
+        .exec(async (err, cls) => {
+            if (err){
+                return res.status(400).json({
+                    err: err,
+                })
+            }else{
+                if (!cls.assignmentList){
+                    return res.status(200).json({
+                        data: [],
+                        message: "Assignment is empty"
+                    })
+                }
+                var mean = 0;
+                for (let i=0 ;i < cls.assignmentList.length ; i++ ){
+                    await Assignment.findOne({_id: cls.assignmentList[i]._id}).sort({"createdAt": -1})
+                    .exec((err, ass) => {
+                        let result = ass.studentGrade;
+                        let tmp = result.findIndex(x => x.studentId == result[i].studentId);
+                        for (let i=0 ; i < result.length ; i++ ){
+                            if (result.studentId == req.params.studentID){
+                                mean = (ass.grade / 10) * result[i].grade;
+                                break;
+                            }
+                        }
+
+                        if (i == cls.assignmentList.length - 1){
+                            return res.status(200).json({
+                                data: mean,
+                                studentId : result.studentId,
+                            })
+                        }
+                        // You can also use the mv() method to place the file in a upload directory (i.e. 'uploads')
+                        // Send response
+                    })
+                   
+                }
+             
+            }
+        })
+    }else{
+        return res.status(400).json({
+            message: "Please login",
+        })
+    }
+    // return res.status(200).json({req});
+    
+}
+
+
+
 
 
 

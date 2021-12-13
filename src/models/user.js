@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const Notification = require('./notification').schema;
 
 const userSchema = new mongoose.Schema({ 
     firstName: {
@@ -57,7 +58,8 @@ const userSchema = new mongoose.Schema({
     studentId: {
         type: String,
         trim: true,
-    }
+    },
+    notificationList: [{type: Notification}],
 },{timestamps: true});
 
 

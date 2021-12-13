@@ -6,7 +6,7 @@ const {createNewClass, getAllClass,getSpecificClass , generateLink, decodeLink
         , sendInvitationLink,readInvitationLink, joininClass, getClassAtendance, classDetail,
              gradeNew, newAssignment , removeAssignment, updateAssignment, getExcelStudentList,
              getExcelAssignment ,uploadExcelStudentList ,getTemplateStudentList , getTemplateAsGrade,
-             uploadExcelAssignmentGrade, uploadSpecificAssignmentGrade , getTotalGrade} = require("../controller/classroom");
+             uploadExcelAssignmentGrade, uploadSpecificAssignmentGrade , getTotalGrade , getStudentGrade} = require("../controller/classroom");
 const {signin,signup, facebookLogin, googleLogin, manageProfile , 
         banAccount, unbanAccount , atc , getAllAccount} = require("../controller/auth");
 
@@ -61,6 +61,7 @@ router.get('/class/:classId/:assId/download/xlsx', getExcelAssignment);
 router.post('/class/:id/uploadSL/xlsx', uploadExcelStudentList);
 
 router.get('/class/:classId/getTotalGrade', getTotalGrade);
+router.get('/class/:classId/:studentId/overall', getStudentGrade);
 
 router.get('/class/grade/template', getTemplateAsGrade);
 router.get('/class/sl/template', getTemplateStudentList);
