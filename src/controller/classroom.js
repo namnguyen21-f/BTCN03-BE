@@ -2,6 +2,8 @@ const Classroom = require("../models/classroom");
 const User = require("../models/user");
 const Invitation = require("../models/invitation");
 const Assignment = require("../models/assignment");
+const Request = require("../models/request");
+const Notification = require("../models/notification");
 var nodemailer = require("nodemailer");
 const excel = require("exceljs");
 const excelToJson = require('convert-excel-to-json');
@@ -1017,8 +1019,9 @@ exports.getStudentGrade = async (req, res) => {
                         let result = ass.studentGrade;
                         let tmp = result.findIndex(x => x.studentId == result[i].studentId);
                         for (let i=0 ; i < result.length ; i++ ){
-                            if (result.studentId == req.params.studentID){
-                                mean = (ass.grade / 10) * result[i].grade;
+                            if (result[i].studentId == req.params.studentID){
+                                
+                                mean = mean + (ass.grade / 10) * result[i].grade;
                                 break;
                             }
                         }
@@ -1026,7 +1029,7 @@ exports.getStudentGrade = async (req, res) => {
                         if (i == cls.assignmentList.length - 1){
                             return res.status(200).json({
                                 data: mean,
-                                studentId : result.studentId,
+                                studentId: req.params.studentID,
                             })
                         }
                         // You can also use the mv() method to place the file in a upload directory (i.e. 'uploads')
@@ -1045,6 +1048,216 @@ exports.getStudentGrade = async (req, res) => {
     // return res.status(200).json({req});
     
 }
+
+
+
+exports.getStudentGradeComposition = async (req, res) => {
+    if (req.user){
+        Classroom.findOne({_id: req.params.classId}).sort({"createdAt": -1})
+        .exec(async (err, cls) => {
+            if (err){
+                return res.status(400).json({
+                    err: err,
+                })
+            }else{
+                if (!cls.assignmentList){
+                    return res.status(200).json({
+                        data: [],
+                        message: "Assignment is empty"
+                    })
+                }
+                var arr = [];
+                var mean = 0;
+                for (let i=0 ;i < cls.assignmentList.length ; i++ ){
+                    await Assignment.findOne({_id: cls.assignmentList[i]._id}).sort({"createdAt": -1})
+                    .exec((err, ass) => {
+                        let result = ass.studentGrade;
+                        let tmp = result.findIndex(x => x.studentId == result[i].studentId);
+                        for (let i=0 ; i < result.length ; i++ ){
+                            if (result[i].studentId == req.params.studentID){
+                                arr.push({
+                                    name: ass.name,
+                                    grade: ass.grade,
+                                    stuGrade: result[i].grade,
+                                })
+                                mean = mean + (ass.grade / 10) * result[i].grade;
+                                break;
+                            }
+                        }
+
+                        if (i == cls.assignmentList.length - 1){
+                            return res.status(200).json({
+                                mean: mean,
+                                data : arr,
+                                studentId: req.params.studentID,
+                            })
+                        }
+                        // You can also use the mv() method to place the file in a upload directory (i.e. 'uploads')
+                        // Send response
+                    })
+                   
+                }
+             
+            }
+        })
+    }else{
+        return res.status(400).json({
+            message: "Please login",
+        })
+    }
+    // return res.status(200).json({req});
+    
+}
+
+
+exports.sendReviewRequest = async (req, res) => {
+    if (req.user){
+        Classroom.findOne({_id: req.params.classId}).sort({"createdAt": -1})
+        .exec(async (err, cls) => {
+            if (err){
+                return res.status(400).json({
+                    err: err,
+                })
+            }else{
+                if (!cls.assignmentList){
+                    return res.status(400).json({
+                        message: "Request Failed",
+                    })
+                }else{
+                    let tmp = cls.assignmentList.findIndex(x => x._id == req.params.assId);
+                    if (tmp == -1){
+                        return res.status(400).json({
+                            message: "Assigment is not exist",
+                        })
+                    }else{
+                        const {
+                            grade,
+                            text,
+                            studentId,
+                        } = req.body;
+                        
+                        const newRequest = new Request({
+                            grade,
+                            text: text,
+                            studentId: studentId,
+                            createdBy: req.user._id,
+                            assId : req.params.assId,
+                            classId: req.params.classId,
+                            status: "no"
+                        })
+                    
+                    
+                        newRequest.save((err,data) => {
+                            if (err){
+                                return res.status(400).json({
+                                    message: "Something Wrong",
+                                    err: err,
+                                })
+                            }else{
+                                const newNotification = new Notification({
+                                    title : "Grade Review Request by Student " + studentId,
+                                    text : text,
+                                    createdBy: req.user._id,
+                                    to : cls.createdBy,
+                                })
+                            
+                            
+                                newNotification.save((err,data) => {
+                                    if (err){
+                                        return res.status(400).json({
+                                            message: "Something Wrong",
+                                            err: err,
+                                        })
+                                    }else{
+                                        return res.status(200).json({
+                                            message: "OK",
+                                          
+                                        })
+                                    } 
+                                })
+                            } 
+                        })
+                    }
+                }
+                
+             
+            }
+        })
+    }else{
+        return res.status(400).json({
+            message: "Please login",
+        })
+    }
+    // return res.status(200).json({req});
+    
+}
+
+
+exports.commentOnReviewRequest = async (req, res) => {
+    if (req.user){
+        Request.findOne({_id: req.params.requestId}).sort({"createdAt": -1})
+        .exec(async (err, reqs) => {
+            if (err){
+                return res.status(400).json({
+                    err: err,
+                })
+            }else{
+                const {
+                    text
+                } = req.body;
+                
+                User.findOne({_id: req.user._id})
+                .exec((err,user) => {
+                    if (err){
+                        return res.status(400).json({
+                            err: err,
+                        })
+                    }
+
+                    if (reqs.comment){
+                        reqs.comment.push({
+                            text,
+                            id: req.user._id,
+                            role: user.role,
+                            createAt: new Date(),
+                            name: user.userName,
+                        })
+                    }else{
+                        reqs.comment = [{
+                            text,
+                            id: req.user._id,
+                            role: user.role,
+                            createAt: new Date(),
+                            name: user.userName,
+                        }]
+                    }
+                    reqs.save((err,data) => {
+                        if (err){
+                            return res.status(400).json({
+                                message: "Something Wrong",
+                                err: err,
+                            })
+                        }else{
+                            return res.status(201).json({
+                                message: "Success"
+                            })
+                        } 
+                    })
+                })
+                
+            }
+        })
+    }else{
+        return res.status(400).json({
+            message: "Please login",
+        })
+    }
+    // return res.status(200).json({req});
+    
+}
+
+
+
 
 
 

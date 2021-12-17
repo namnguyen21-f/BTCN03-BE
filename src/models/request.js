@@ -2,7 +2,11 @@ const mongoose = require('mongoose');
 
 
 const ckSchema = new mongoose.Schema({ 
-    title: {
+    assId: {
+        type: String,
+        require: true,
+    },
+    grade: {
         type: String,
         require: true,
     },
@@ -10,15 +14,23 @@ const ckSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
-    to: {
+    classId: {
         type: String,
-        default: 0,
+        require: true,
     },
     createdBy: {
         type: String,
         require: true,
     },
+    studentId: {
+        type: String,
+    },
+    status: {
+        type: String,
+        require: true,
+    },
+    comment: [],
 },{timestamps: true});
 
 
-module.exports = mongoose.model("Notification", ckSchema);
+module.exports = mongoose.model("Request", ckSchema);

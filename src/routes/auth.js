@@ -6,7 +6,8 @@ const {createNewClass, getAllClass,getSpecificClass , generateLink, decodeLink
         , sendInvitationLink,readInvitationLink, joininClass, getClassAtendance, classDetail,
              gradeNew, newAssignment , removeAssignment, updateAssignment, getExcelStudentList,
              getExcelAssignment ,uploadExcelStudentList ,getTemplateStudentList , getTemplateAsGrade,
-             uploadExcelAssignmentGrade, uploadSpecificAssignmentGrade , getTotalGrade , getStudentGrade} = require("../controller/classroom");
+             uploadExcelAssignmentGrade, uploadSpecificAssignmentGrade , getTotalGrade , getStudentGrade,
+             getStudentGradeComposition, sendReviewRequest} = require("../controller/classroom");
 const {signin,signup, facebookLogin, googleLogin, manageProfile , 
         banAccount, unbanAccount , atc , getAllAccount} = require("../controller/auth");
 
@@ -54,14 +55,16 @@ router.post('/class/:classId/:assId/upload/grade', uploadExcelAssignmentGrade);
 //Input grade for a student at a specific assignment
 router.post('/class/:classId/:assId/:studentId/update/grade', uploadSpecificAssignmentGrade);
 
-
+//review grade from student
+router.post('/class/:classId/:assId/review', sendReviewRequest);
 
 router.get('/class/:id/getSL/xlsx', getExcelStudentList);
 router.get('/class/:classId/:assId/download/xlsx', getExcelAssignment);
 router.post('/class/:id/uploadSL/xlsx', uploadExcelStudentList);
 
 router.get('/class/:classId/getTotalGrade', getTotalGrade);
-router.get('/class/:classId/:studentId/overall', getStudentGrade);
+router.get('/class/:classId/:studentID/overall', getStudentGrade);
+router.get('/class/:classId/:studentID/composition', getStudentGradeComposition);
 
 router.get('/class/grade/template', getTemplateAsGrade);
 router.get('/class/sl/template', getTemplateStudentList);
