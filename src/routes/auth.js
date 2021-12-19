@@ -9,7 +9,7 @@ const {createNewClass, getAllClass,getSpecificClass , generateLink, decodeLink
              uploadExcelAssignmentGrade, uploadSpecificAssignmentGrade , getTotalGrade , getStudentGrade,
              getStudentGradeComposition, sendReviewRequest} = require("../controller/classroom");
 const {signin,signup, facebookLogin, googleLogin, manageProfile , 
-        banAccount, unbanAccount , atc , getAllAccount} = require("../controller/auth");
+        banAccount, unbanAccount , atc , getAllAccount , getNotification} = require("../controller/auth");
 
 
 // const {addStock ,getStockList, getStockStatistic ,getStockProfit , getUserCurrentStock, getStockTransactionMonth} = require("../controller/stock");
@@ -23,7 +23,7 @@ router.post('/changeProfile' , manageProfile);
 router.post('/admin/:userId/ban' , banAccount);
 router.post('/admin/:userId/unban' , unbanAccount);
 router.get('/admin/getAllAccount' , getAllAccount);
-
+router.get('/notififcations' , getNotification);
 
 router.post('/class/new' , createNewClass);
 router.get('/class/:id/getClassAte' , getClassAtendance);

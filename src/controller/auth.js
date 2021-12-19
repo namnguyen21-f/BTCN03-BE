@@ -4,6 +4,7 @@ const {OAuth2Client} = require('google-auth-library');
 // const { response } = require("express");
 // const fetch= require("node-fetch");
 const axios = require('axios');
+const Notification = require("../models/notification");
 
 const client= new OAuth2Client("405769286115-ccpu4vsplvrfttij8im3r7hbhsoupg1h.apps.googleusercontent.com");
 
@@ -437,6 +438,20 @@ exports.unbanAccount = (req,res) =>{
         })
     }
     
+}
+
+exports.getNotification = (req,res) =>{
+    Notification.find({to: req.user._id})
+    .exec((err,notifs) => {
+        if (err){
+            return res.status(400).json({
+                err: err,
+            })
+        }
+        return res.status(200).json({
+            data: notifs,
+        })
+    })
 }
 
 
