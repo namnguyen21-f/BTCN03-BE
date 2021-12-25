@@ -690,7 +690,7 @@ exports.newAssignment= (req, res)=>{
             }else{
                 const {
                     fieldArray,
-                    // name,
+                    name,
                     // grade
                 } = req.body;
 
@@ -702,7 +702,7 @@ exports.newAssignment= (req, res)=>{
                             // name: name,
                             // grade: grade,
                             // fieldArray: fieldArray,
-                            name: fieldArray[i].name,
+                            name: fieldArray[i].gradeText,
                             grade: fieldArray[i].grade,
                             createdBy: req.user._id,
                         })
@@ -1047,6 +1047,43 @@ exports.getStudentGrade = async (req, res) => {
     }
     // return res.status(200).json({req});
     
+}
+
+exports.getAssignment= async(req, res)=>{
+    if(req.user){
+        Classroom.findOne({_id: req.params.classId}).sort({"createdAt": -1})
+        .exec(async(err, cls)=>{
+            if (err){
+                return res.status(400).json({
+                    err: err,
+                })
+            }
+            else{
+                if (!cls.assignmentList){
+                    return res.status(200).json({
+                        data: [],
+                        message: "Assignment is empty"
+                    })
+                }
+                var result= []
+                for(let ass of cls.assignmentList){
+                    await Assignment.findOne({_id: ass._id}).sort({"createdAt": -1})
+                    .exec((err, assObject)=>{
+                        result.push(assObject)
+
+                        if(ass == cls.assignmentList[cls.assignmentList.length-1]){
+                            return res.status(200).send(result)
+                        }
+                    })
+                }
+            }
+        })
+    }
+    else{
+        return res.status(400).json({
+            message: "Please login",
+        })
+    }
 }
 
 
