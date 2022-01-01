@@ -299,6 +299,7 @@ exports.uploadExcelAssignmentGrade = async (req, res) => {
                                     let tmp = {
                                         studentId : result[i].A, 
                                         grade: result[i].B,
+                                        mark: false,
                                     };
                                     await User.findOne({ studentId: result[i].A }, function (err, doc) {
                                         if (doc){
@@ -363,7 +364,7 @@ exports.uploadSpecificAssignmentGrade = async (req, res) => {
                         }else{
                             let result = ass.studentGrade;
                             let flag = 0;
-                            if (ass.studentGrade){
+                            if (ass.studentGrade){  
                                 for (let i=0 ; i < result.length ; i++ ){
                                     if (result[i].studentId == req.params.studentId){
                                         flag = 1;
@@ -382,6 +383,7 @@ exports.uploadSpecificAssignmentGrade = async (req, res) => {
                                     ass.studentGrade.push({
                                         studentId : studentId,
                                         grade: grade,
+                                        mark: false,
                                         user :{
                                             id : userId,
                                             studentId : studentId,
@@ -396,6 +398,7 @@ exports.uploadSpecificAssignmentGrade = async (req, res) => {
                                 ass.studentGrade = [{
                                     studentId : studentId,
                                     grade: grade,
+                                    mark: false,
                                     user :{
                                         id : userId,
                                         studentId : studentId,
@@ -1227,6 +1230,93 @@ exports.sendReviewRequest = async (req, res) => {
     }
     // return res.status(200).json({req});
     
+}
+
+exports.markFinalize= (req, res)=>{
+    if (req.user){
+        Classroom.findOne({_id: req.params.classId}).sort({"createdAt": -1})
+        .exec((err, cls) => {
+            if (err){
+                return res.status(400).json({
+                    err: err,
+                })
+            }else{
+                Assignment.findOne({_id: req.params.assId})
+                        .exec((err, ass) => {
+                            if (err){
+                                return res.status(400).json({
+                                    message: "Something Wrong",
+                                    err: err,
+                                })
+                            }else{
+                                const {
+                                    mark,
+                                }= req.body
+                                let gradeTemp= ass.studentGrade
+                                let flag=0
+                                for(let i=0; i<gradeTemp.length; i++){
+                                    if(gradeTemp[i].studentId == req.params.studentId){
+                                        gradeTemp[i].mark= mark
+                                        flag=1
+                                        break
+                                    }
+                                }
+                                if(flag==1){
+                                    ass.studentGrade = [];
+                                    ass.studentGrade= gradeTemp
+                                    ass.save( function(err){
+                                        if(err) return res.status(500).send(err);
+                                        return res.status(200).send({message: "OK"})
+                                    })
+                                }
+                            } 
+                        })
+            }
+        })
+    }else{
+        return res.status(400).json({
+            message: "Please login",
+        })
+    }
+}
+
+exports.getStudentMarked= (req, res)=>{
+    if(req.user){
+        Classroom.findOne({_id: req.params.classId}).sort({"createdAt": -1})
+        .exec((err, cls)=>{
+            if (err){
+                return res.status(400).json({
+                    err: err,
+                })
+            }
+            else{
+                if (!cls.assignmentList){
+                    return res.status(200).json({
+                        data: [],
+                        message: "Assignment is empty"
+                    })
+                }
+                var result= []
+                for(let ass of cls.assignmentList){
+                    Assignment.findOne({_id: ass._id}).sort({"createdAt": -1})
+                    .exec((err, assObject)=>{
+                        for(let student of assObject.studentGrade){
+                            if(student.mark){
+                                result= [...result, [ass._id, student.studentId]]
+                            }
+                        }
+                        if(ass == cls.assignmentList[cls.assignmentList.length-1]){
+                            return res.status(200).send(result)
+                        }
+                    })
+                }
+            }
+        })
+    }else{
+        return res.status(400).json({
+            message: "Please login",
+        })
+    }
 }
 
 

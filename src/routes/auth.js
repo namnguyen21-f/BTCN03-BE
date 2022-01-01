@@ -7,7 +7,7 @@ const {createNewClass, getAllClass,getSpecificClass , generateLink, decodeLink
              gradeNew, newAssignment , removeAssignment, updateAssignment, getExcelStudentList,
              getExcelAssignment ,uploadExcelStudentList ,getTemplateStudentList , getTemplateAsGrade,
              uploadExcelAssignmentGrade, uploadSpecificAssignmentGrade , getTotalGrade , getStudentGrade, getAssignment,
-             getStudentGradeComposition, sendReviewRequest} = require("../controller/classroom");
+             getStudentGradeComposition, sendReviewRequest, markFinalize, getStudentMarked} = require("../controller/classroom");
 
 const {signin,signup, facebookLogin, googleLogin, manageProfile , 
         banAccount, unbanAccount , atc , getAllAccount , getNotification} = require("../controller/auth");
@@ -73,6 +73,9 @@ router.get('/class/grade/template', getTemplateAsGrade);
 router.get('/class/sl/template', getTemplateStudentList);
 
 router.get('/class/:classId/getAss', getAssignment);
+
+router.post('/class/:classId/:assId/:studentId/markFinalize', markFinalize);
+router.get('/class/:classId/studentMarked', getStudentMarked)
 
 
 
