@@ -11,6 +11,7 @@ const {createNewClass, getAllClass,getSpecificClass , generateLink, decodeLink
 
 const {signin,signup, facebookLogin, googleLogin, manageProfile , 
         banAccount, unbanAccount , atc , getAllAccount , getNotification} = require("../controller/auth");
+const { getGradeUser } = require("../controller/gradeViewer");
 
 
 // const {addStock ,getStockList, getStockStatistic ,getStockProfit , getUserCurrentStock, getStockTransactionMonth} = require("../controller/stock");
@@ -74,9 +75,10 @@ router.get('/class/sl/template', getTemplateStudentList);
 
 router.get('/class/:classId/getAss', getAssignment);
 
-router.post('/class/:classId/:assId/:studentId/markFinalize', markFinalize);
+router.post('/class/:classId/:assId/markFinalize', markFinalize);
 router.get('/class/:classId/studentMarked', getStudentMarked)
 
+router.get('/class/:classId/getGradeUser', getGradeUser)
 
 
 // router.post('/addStock' , addStock);

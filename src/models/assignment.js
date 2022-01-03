@@ -21,6 +21,10 @@ const assignment = new mongoose.Schema({
         type: String,
         require: true,
     },
+    mark: {
+        type: String,
+        require: true,
+    },
     studentGrade : [],
 },{timestamps: true});
 

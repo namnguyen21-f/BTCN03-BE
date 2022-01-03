@@ -56,7 +56,7 @@ exports.createNewClass = (req, res) => {
         })
     }else{
         return res.status(400).json({
-            err: "rror",
+            err: "error",
         })
     }
     
@@ -104,11 +104,12 @@ exports.getClassAtendance = (req, res) => {
                     let t_arr = [];
                     let s_arr = [];
                     for (let i=0; i < cls.attendantList.length ;i++){
-                        let {firstName, lastName, email} = cls.attendantList[i];
                         if (cls.attendantList[i].role == "teacher"){
+                            let {firstName, lastName, email} = cls.attendantList[i];
                             t_arr.push({firstName, lastName, email})
                         }else if (cls.attendantList[i].role == "user"){
-                            s_arr.push({firstName, lastName, email})
+                            let {firstName, lastName, email, studentId} = cls.attendantList[i];
+                            s_arr.push({firstName, lastName, email, studentId})
                         }
                     }
                     return res.status(200).json({
@@ -299,7 +300,6 @@ exports.uploadExcelAssignmentGrade = async (req, res) => {
                                     let tmp = {
                                         studentId : result[i].A, 
                                         grade: result[i].B,
-                                        mark: false,
                                     };
                                     await User.findOne({ studentId: result[i].A }, function (err, doc) {
                                         if (doc){
@@ -383,7 +383,6 @@ exports.uploadSpecificAssignmentGrade = async (req, res) => {
                                     ass.studentGrade.push({
                                         studentId : studentId,
                                         grade: grade,
-                                        mark: false,
                                         user :{
                                             id : userId,
                                             studentId : studentId,
@@ -398,7 +397,6 @@ exports.uploadSpecificAssignmentGrade = async (req, res) => {
                                 ass.studentGrade = [{
                                     studentId : studentId,
                                     grade: grade,
-                                    mark: false,
                                     user :{
                                         id : userId,
                                         studentId : studentId,
@@ -708,6 +706,7 @@ exports.newAssignment= (req, res)=>{
                             name: fieldArray[i].gradeText,
                             grade: fieldArray[i].grade,
                             createdBy: req.user._id,
+                            mark: false,
                         })
                         await newAssignment.save(async (err,data) => {
                             if (err){
@@ -1252,23 +1251,28 @@ exports.markFinalize= (req, res)=>{
                                 const {
                                     mark,
                                 }= req.body
-                                let gradeTemp= ass.studentGrade
-                                let flag=0
-                                for(let i=0; i<gradeTemp.length; i++){
-                                    if(gradeTemp[i].studentId == req.params.studentId){
-                                        gradeTemp[i].mark= mark
-                                        flag=1
-                                        break
-                                    }
-                                }
-                                if(flag==1){
-                                    ass.studentGrade = [];
-                                    ass.studentGrade= gradeTemp
-                                    ass.save( function(err){
-                                        if(err) return res.status(500).send(err);
-                                        return res.status(200).send({message: "OK"})
-                                    })
-                                }
+                                ass.mark= mark
+                                ass.save( function(err){
+                                    if(err) return res.status(500).send(err);
+                                    return res.status(200).send({message: "OK"})
+                                })
+                                // let gradeTemp= ass.studentGrade
+                                // let flag=0
+                                // for(let i=0; i<gradeTemp.length; i++){
+                                //     if(gradeTemp[i].studentId == req.params.studentId){
+                                //         gradeTemp[i].mark= mark
+                                //         flag=1
+                                //         break
+                                //     }
+                                // }
+                                // if(flag==1){
+                                //     ass.studentGrade = [];
+                                //     ass.studentGrade= gradeTemp
+                                //     ass.save( function(err){
+                                //         if(err) return res.status(500).send(err);
+                                //         return res.status(200).send({message: "OK"})
+                                //     })
+                                // }
                             } 
                         })
             }
@@ -1300,10 +1304,8 @@ exports.getStudentMarked= (req, res)=>{
                 for(let ass of cls.assignmentList){
                     Assignment.findOne({_id: ass._id}).sort({"createdAt": -1})
                     .exec((err, assObject)=>{
-                        for(let student of assObject.studentGrade){
-                            if(student.mark){
-                                result= [...result, [ass._id, student.studentId]]
-                            }
+                        if(assObject.mark){
+                            result= [...result, ass._id]
                         }
                         if(ass == cls.assignmentList[cls.assignmentList.length-1]){
                             return res.status(200).send(result)
