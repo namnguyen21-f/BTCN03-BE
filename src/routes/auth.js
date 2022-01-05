@@ -7,11 +7,12 @@ const {createNewClass, getAllClass,getSpecificClass , generateLink, decodeLink
              gradeNew, newAssignment , removeAssignment, updateAssignment, getExcelStudentList,
              getExcelAssignment ,uploadExcelStudentList ,getTemplateStudentList , getTemplateAsGrade,
              uploadExcelAssignmentGrade, uploadSpecificAssignmentGrade , getTotalGrade , getStudentGrade, getAssignment,
-             getStudentGradeComposition, sendReviewRequest, markFinalize, getStudentMarked} = require("../controller/classroom");
+             getStudentGradeComposition, sendReviewRequest, markFinalize, getStudentMarked, commentOnReviewRequest} = require("../controller/classroom");
 
 const {signin,signup, facebookLogin, googleLogin, manageProfile , 
         banAccount, unbanAccount , atc , getAllAccount , getNotification} = require("../controller/auth");
-const { getGradeUser } = require("../controller/gradeViewer");
+const { getGradeUser, getCommentsUser } = require("../controller/gradeViewer");
+const {getAllRequest}= require("../controller/gradeReview");
 
 
 // const {addStock ,getStockList, getStockStatistic ,getStockProfit , getUserCurrentStock, getStockTransactionMonth} = require("../controller/stock");
@@ -80,6 +81,11 @@ router.get('/class/:classId/studentMarked', getStudentMarked)
 
 router.get('/class/:classId/getGradeUser', getGradeUser)
 
+router.post('/class/:studentId/:assId/comment', commentOnReviewRequest)
+// for user
+router.post('/class/:studentId/:assId/getCommentsUser', getCommentsUser)
+
+router.get('/class/:classId/getAllRequest', getAllRequest)
 
 // router.post('/addStock' , addStock);
 

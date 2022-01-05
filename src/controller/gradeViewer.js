@@ -1,6 +1,7 @@
 const Classroom = require("../models/classroom");
 const User = require("../models/user");
 const Assignment = require("../models/assignment");
+const Request = require("../models/request");
 
 
 exports.getGradeUser= (req, res)=>{
@@ -51,6 +52,25 @@ exports.getGradeUser= (req, res)=>{
 
                     }
                 })
+            }
+        })
+    }else{
+        return res.status(400).json({
+            err: "error",
+        })
+    }
+}
+
+exports.getCommentsUser= (req, res)=>{
+    if(req.user){
+        Request.findOne({assId: req.params.assId, studentId: req.params.studentId}).sort({"createdAt": -1})
+        .exec((err, dataReq)=>{
+            if (err){
+                return res.status(400).json({
+                    err: err,
+                })
+            }else{
+                return res.status(200).send(dataReq.comment)
             }
         })
     }else{

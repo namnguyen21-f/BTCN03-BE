@@ -976,7 +976,7 @@ exports.getTotalGrade = async (req, res) => {
                             
                         }
                         if (i == cls.assignmentList.length - 1){
-                                
+                            console.log(sg_arr)
                             return res.status(200).json({
                                 data: sg_arr,
                             })
@@ -1173,12 +1173,14 @@ exports.sendReviewRequest = async (req, res) => {
                             grade,
                             text,
                             studentId,
+                            assName
                         } = req.body;
                         
                         const newRequest = new Request({
                             grade,
                             text: text,
                             studentId: studentId,
+                            assName: assName,
                             createdBy: req.user._id,
                             assId : req.params.assId,
                             classId: req.params.classId,
@@ -1324,7 +1326,7 @@ exports.getStudentMarked= (req, res)=>{
 
 exports.commentOnReviewRequest = async (req, res) => {
     if (req.user){
-        Request.findOne({_id: req.params.requestId}).sort({"createdAt": -1})
+        Request.findOne({assId: req.params.assId, studentId: req.params.studentId}).sort({"createdAt": -1})
         .exec(async (err, reqs) => {
             if (err){
                 return res.status(400).json({
@@ -1334,7 +1336,6 @@ exports.commentOnReviewRequest = async (req, res) => {
                 const {
                     text
                 } = req.body;
-                
                 User.findOne({_id: req.user._id})
                 .exec((err,user) => {
                     if (err){

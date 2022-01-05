@@ -29,6 +29,10 @@ const ckSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
+    assName:{
+        type: String,
+        require: true,
+    },
     comment: [],
 },{timestamps: true});
 
