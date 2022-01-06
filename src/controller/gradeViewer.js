@@ -61,16 +61,16 @@ exports.getGradeUser= (req, res)=>{
     }
 }
 
-exports.getCommentsUser= (req, res)=>{
+exports.getComments= (req, res)=>{
     if(req.user){
-        Request.findOne({assId: req.params.assId, studentId: req.params.studentId}).sort({"createdAt": -1})
+        Request.find({classId: req.params.classId}).sort({"createdAt": 0})
         .exec((err, dataReq)=>{
             if (err){
                 return res.status(400).json({
                     err: err,
                 })
             }else{
-                return res.status(200).send(dataReq.comment)
+                return res.status(200).send(dataReq)
             }
         })
     }else{
