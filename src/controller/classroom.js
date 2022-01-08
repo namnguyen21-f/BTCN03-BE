@@ -1291,7 +1291,7 @@ exports.getAssMarked= (req, res)=>{
                 for(let ass of cls.assignmentList){
                     Assignment.findOne({_id: ass._id}).sort({"createdAt": -1})
                     .exec((err, assObject)=>{
-                        if(assObject.mark){
+                        if(assObject.mark== "true"){
                             result= [...result, ass._id]
                         }
                         if(ass == cls.assignmentList[cls.assignmentList.length-1]){
