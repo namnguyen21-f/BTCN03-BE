@@ -10,7 +10,7 @@ const {createNewClass, getAllClass,getSpecificClass , generateLink, decodeLink
              getStudentGradeComposition, sendReviewRequest, markFinalize, getAssMarked, commentOnReviewRequest} = require("../controller/classroom");
 
 const {signin,signup, facebookLogin, googleLogin, manageProfile , 
-        banAccount, unbanAccount , atc , getAllAccount , getNotification} = require("../controller/auth");
+        banAccount, unbanAccount , atc , getAllAccount , getNotification, getNotificationListStudent} = require("../controller/auth");
 const { getGradeUser } = require("../controller/gradeViewer");
 const {getAllRequest, getOldGrade, finalizeStudent, getFinalStudent}= require("../controller/gradeReview");
 
@@ -87,6 +87,7 @@ router.get('/class/:classId/getAllRequest', getAllRequest)
 router.get('/class/:studentId/:assId/getOldGrade', getOldGrade)
 router.post('/class/:classId/:assId/:studentId/finalizeStudent', finalizeStudent)
 router.get('/class/:classId/getFinalStudent', getFinalStudent)
+router.get('/class/getNotificationListStudent', getNotificationListStudent)
 
 // router.post('/addStock' , addStock);
 

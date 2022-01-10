@@ -14,6 +14,9 @@ const ckSchema = new mongoose.Schema({
         type: String,
         default: 0,
     },
+    toList:{
+        type: [String]
+    },
     createdBy: {
         type: String,
         require: true,

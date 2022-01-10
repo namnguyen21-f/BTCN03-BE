@@ -454,6 +454,20 @@ exports.getNotification = (req,res) =>{
     })
 }
 
+exports.getNotificationListStudent = (req,res) =>{
+    Notification.find({to: {$elemMatch: req.user._id}})
+    .exec((err,notifs) => {
+        if (err){
+            return res.status(400).json({
+                err: err,
+            })
+        }
+        return res.status(200).json({
+            data: notifs,
+        })
+    })
+}
+
 
 
 

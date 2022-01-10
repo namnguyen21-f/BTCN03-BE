@@ -1254,10 +1254,34 @@ exports.markFinalize= (req, res)=>{
                             }else{
                                 const {
                                     mark,
+                                    // listStudent
                                 }= req.body
                                 ass.mark= mark
                                 ass.save( function(err){
                                     if(err) return res.status(500).send(err);
+                                    // else{
+                                    //     const newNotification = new Notification({
+                                    //         title : "Grade Review Request by Student " + studentId,
+                                    //         text : text,
+                                    //         createdBy: req.user._id,
+                                    //         to : cls.createdBy,
+                                    //     })
+                                    
+                                    
+                                    //     newNotification.save((err,data) => {
+                                    //         if (err){
+                                    //             return res.status(400).json({
+                                    //                 message: "Something Wrong",
+                                    //                 err: err,
+                                    //             })
+                                    //         }else{
+                                    //             return res.status(200).json({
+                                    //                 message: "OK",
+                                                  
+                                    //             })
+                                    //         } 
+                                    //     })
+                                    // }
                                     return res.status(200).send({message: "OK"})
                                 })
                             } 

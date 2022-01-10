@@ -2,6 +2,7 @@ const Classroom = require("../models/classroom");
 const User = require("../models/user");
 const Assignment = require("../models/assignment");
 const Request = require("../models/request");
+const Notification = require("../models/notification")
 
 exports.getAllRequest= (req, res)=>{
     if(req.user){
@@ -16,7 +17,7 @@ exports.getAllRequest= (req, res)=>{
             }
         })
     }else{
-        return res.status(400).json({
+        return res.status(400).json({ 
             message: "Please login",
         })
     }
@@ -55,7 +56,7 @@ exports.finalizeStudent= (req, res)=>{
                 })
             }else{
                 Assignment.findOne({_id: req.params.assId})
-                        .exec((err, ass) => {
+                        .exec((err, ass) => { 
                             if (err){
                                 return res.status(400).json({
                                     message: "Something Wrong",
@@ -79,7 +80,38 @@ exports.finalizeStudent= (req, res)=>{
                                     ass.studentGrade= gradeTemp
                                     ass.save( function(err){
                                         if(err) return res.status(500).send(err);
-                                        return res.status(200).send({message: "OK"})
+                                        else{
+                                            Request.find({studentId: req.params.studentId, assId: req.params.assId}).sort({"createdAt": -1})
+                                            .exec((err, reqs)=>{
+                                                if (err){
+                                                    return res.status(400).json({
+                                                        err: err,
+                                                    })
+                                                }
+                                                if(reqs.length>0){
+                                                    const newNotification = new Notification({
+                                                        title : "Teacher was decided final mark your review",
+                                                        createdBy: cls.createdBy,
+                                                        to : reqs[0].createdBy,
+                                                    })
+                                                
+                                                
+                                                    newNotification.save((err,data) => {
+                                                        if (err){
+                                                            return res.status(400).json({
+                                                                message: "Something Wrong",
+                                                                err: err,
+                                                            })
+                                                        }else{
+                                                            return res.status(200).json({
+                                                                message: "OK",
+                                                              
+                                                            })
+                                                        } 
+                                                    })
+                                                }
+                                                })
+                                        }
                                     })
                                 }
                             } 
@@ -127,7 +159,7 @@ exports.getFinalStudent= (req, res)=>{
         })
     }else{
         return res.status(400).json({
-            message: "Please login",
+            message: "Please login", 
         })
     }
 }
