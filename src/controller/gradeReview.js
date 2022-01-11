@@ -34,7 +34,7 @@ exports.getOldGrade= (req, res)=>{
             }else{
                 for(let stu of data.studentGrade){
                     if(stu.studentId == req.params.studentId){
-                        return res.status(200).send(stu.grade)
+                        return res.status(200).send(stu.grade.toString())
                     }
                 }
             }
